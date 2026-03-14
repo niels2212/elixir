@@ -1,0 +1,1233 @@
+{% comment %} Google Fonts for accent text customization {% endcomment %}
+{% if section.settings.override_global_accent %}
+  {% if section.settings.accent_font_family != 'inherit' and section.settings.accent_font_family != 'serif' %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    {% case section.settings.accent_font_family %}
+      {% when 'Georgia Pro' %}
+        <link href="https://fonts.googleapis.com/css2?family=Georgia+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+      {% when 'Bodoni Moda' %}
+        <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400;1,6..96,500;1,6..96,600;1,6..96,700&display=swap" rel="stylesheet">
+      {% when 'Instrument Serif' %}
+        <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+      {% when 'DM Serif Text' %}
+        <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
+      {% when 'Nothing You Could Do' %}
+        <link href="https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
+    {% endcase %}
+  {% endif %}
+{% endif %}
+
+<section class="four-images-section four-images-section--{{ section.id }} page-fade-in" 
+         style="
+           padding-top: {{ section.settings.section_padding_top }}px;
+           padding-bottom: {{ section.settings.section_padding_bottom }}px;
+           background-color: {% if section.settings.use_theme_colors %}{{ settings.global_section_background_color }}{% else %}{{ section.settings.section_background_color }}{% endif %};
+         "
+         aria-labelledby="four-images-title-{{ section.id }}">
+  
+  <div class="four-images-section__container" 
+       style="
+         max-width: {{ section.settings.section_max_width }}px;
+         padding-left: {{ section.settings.container_padding_horizontal }}px;
+         padding-right: {{ section.settings.container_padding_horizontal }}px;
+       ">
+    
+
+                {% if section.settings.main_heading != blank or section.settings.accent_text != blank %}
+                     <h2 id="four-images-title-{{ section.id }}" 
+                   class="four-images-section__heading"
+                   style="
+                     text-align: {{ section.settings.text_alignment }};
+                     color: {% if section.settings.use_theme_colors %}{{ settings.global_section_text_color }}{% else %}{{ section.settings.main_heading_color }}{% endif %};
+                     font-size: {{ section.settings.main_heading_font_size }}px;
+                     margin-top: {{ section.settings.main_heading_margin_top }}px;
+                     margin-bottom: {{ section.settings.main_heading_margin_bottom }}px;
+                   ">
+                {% if section.settings.main_heading != blank %}{{ section.settings.main_heading }}{% endif %}{% if section.settings.accent_text != blank %} <span class="accent{% unless section.settings.override_global_accent %} global-accent-text{% endunless %}">{{ section.settings.accent_text }}</span>{% endif %}
+              </h2>
+            {% endif %}
+
+    {% if section.settings.subtitle != blank %}
+             <p class="four-images-section__subtitle"
+          style="
+            text-align: {{ section.settings.text_alignment }};
+            color: {% if section.settings.use_theme_colors %}{{ settings.global_section_text_color }}{% else %}{{ section.settings.subtitle_color }}{% endif %};
+            font-size: {{ section.settings.subtitle_font_size }}px;
+            margin-top: {{ section.settings.subtitle_margin_top }}px;
+            margin-bottom: {{ section.settings.subtitle_margin_bottom }}px;
+          ">
+        {{ section.settings.subtitle }}
+      </p>
+    {% endif %}
+
+         <div class="four-images-section__grid"
+          style="
+            gap: {{ section.settings.desktop_gap_vertical }}px {{ section.settings.desktop_gap_horizontal }}px;
+            grid-template-columns: repeat({{ section.settings.desktop_columns }}, 1fr);
+            margin-top: {{ section.settings.grid_margin_top }}px;
+          ">
+      
+      {% for block in section.blocks %}
+        {% case block.type %}
+          {% when 'item' %}
+                         <article class="four-images-section__item" {{ block.shopify_attributes }}
+                      style="
+                        padding-left: {{ section.settings.card_padding_horizontal }}px; 
+                        padding-right: {{ section.settings.card_padding_horizontal }}px;
+                        {% if section.settings.enable_card_styling %}
+                          background-color: {{ section.settings.card_background_color }};
+                          border: {{ section.settings.card_border_width }}px solid {{ section.settings.card_border_color }};
+                          border-radius: {{ section.settings.card_border_radius }}px;
+                          padding-top: {{ section.settings.card_padding_vertical }}px;
+                          padding-bottom: {{ section.settings.card_padding_vertical }}px;
+                        {% endif %}
+                      ">
+                              <div class="four-images-section__media"
+                    style="
+                      border-radius: {{ section.settings.card_border_radius }}px;
+                      {% unless section.settings.enable_card_styling %}
+                        background-color: {{ section.settings.card_background_color }};
+                      {% endunless %}
+                    ">
+                 {% if block.settings.media_type == 'video' and block.settings.step_video %}
+                   <video 
+                     controls 
+                     muted 
+                     playsinline
+                     style="
+                       width: 100%;
+                       height: 100%;
+                       object-fit: cover;
+                       border-radius: {{ section.settings.image_border_radius }}px !important;
+                     ">
+                     {% for source in block.settings.step_video.sources %}
+                       <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                     {% endfor %}
+                     Your browser does not support the video tag.
+                   </video>
+                 {% elsif block.settings.media_type == 'image' and block.settings.step_image %}
+                   <img src="{{ block.settings.step_image | image_url: width: 600 }}"
+                        alt="{{ block.settings.step_image.alt | default: block.settings.step_title }}"
+                        loading="lazy"
+                        width="293"
+                        height="293"
+                        style="
+                          border-radius: {{ section.settings.image_border_radius }}px !important;
+                        ">
+                 {% else %}
+                    <div class="four-images-section__placeholder"
+                         style="
+                           background-color: {{ section.settings.placeholder_background_color }};
+                           border-radius: {{ section.settings.image_border_radius }}px !important;
+                         ">
+                      <span style="color: {{ section.settings.placeholder_text_color }};">
+                        {% if block.settings.media_type == 'video' %}Video{% else %}Image{% endif %} Placeholder
+                      </span>
+                    </div>
+                  {% endif %}
+               </div>
+
+               <div class="four-images-section__content"
+                    style="margin-top: 24px;">
+                 {% if block.settings.step_title != blank %}
+                                       <h3 class="four-images-section__title"
+                        style="
+                          color: {% if section.settings.use_theme_colors %}{{ settings.global_section_text_color }}{% else %}{{ section.settings.step_title_color }}{% endif %};
+                          font-size: {{ section.settings.item_title_font_size }}px;
+                          margin-top: {{ section.settings.step_title_margin_top }}px;
+                          margin-bottom: {{ section.settings.global_text_margin_bottom }}px;
+                          text-align: {{ section.settings.step_text_alignment }};
+                        ">
+                     {{ block.settings.step_title }}
+                   </h3>
+                 {% endif %}
+
+                 <!-- Divider Line -->
+                 {% if section.settings.show_divider and block.settings.step_title != blank and block.settings.step_description != blank %}
+                   <div class="four-images-section__divider"
+                        style="
+                          width: {{ section.settings.divider_width }}%;
+                          height: {{ section.settings.divider_thickness }}px;
+                          background-color: {% if section.settings.use_theme_colors %}{{ settings.global_section_accent_1_color }}{% else %}{{ section.settings.divider_color }}{% endif %};
+                          margin: {{ section.settings.divider_margin_top }}px auto {{ section.settings.divider_margin_bottom }}px auto;
+                          {% case section.settings.divider_alignment %}
+                            {% when 'left' %}
+                              margin-left: 0;
+                              margin-right: auto;
+                            {% when 'right' %}
+                              margin-left: auto;
+                              margin-right: 0;
+                            {% when 'center' %}
+                              margin-left: auto;
+                              margin-right: auto;
+                          {% endcase %}
+                        ">
+                   </div>
+                 {% endif %}
+
+                 {% if block.settings.step_description != blank %}
+                                       <p class="four-images-section__description"
+                       style="
+                         color: {% if section.settings.use_theme_colors %}{{ settings.global_section_text_color }}{% else %}{{ section.settings.step_description_color }}{% endif %};
+                         font-size: {{ section.settings.item_description_font_size }}px;
+                         margin-top: {{ section.settings.step_description_margin_top }}px;
+                         margin-bottom: {{ section.settings.global_text_margin_bottom }}px;
+                         text-align: {{ section.settings.step_text_alignment }};
+                       ">
+                     {{ block.settings.step_description }}
+                   </p>
+                 {% endif %}
+               </div>
+            </article>
+        {% endcase %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<style>
+.four-images-section--{{ section.id }} {
+  width: 100%;
+}
+
+.four-images-section--{{ section.id }} .four-images-section__container {
+  margin: 0 auto;
+}
+
+.four-images-section--{{ section.id }} .four-images-section__heading,
+.four-images-section--{{ section.id }} .four-images-section__subtitle {
+  margin: 0;
+}
+
+.four-images-section--{{ section.id }} .four-images-section__grid {
+  display: grid;
+  gap: 0px;
+}
+
+.four-images-section--{{ section.id }} .four-images-section__item {
+  display: grid;
+}
+
+.four-images-section--{{ section.id }} .four-images-section__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+}
+
+.four-images-section--{{ section.id }} .four-images-section__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: {{ section.settings.image_focal_point }};
+  display: block;
+  border-radius: {{ section.settings.image_border_radius }}px !important;
+}
+
+.four-images-section--{{ section.id }} .four-images-section__media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: {{ section.settings.image_border_radius }}px !important;
+}
+
+.four-images-section--{{ section.id }} .four-images-section__item-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+ 
+ 
+
+.four-images-section--{{ section.id }} .four-images-section__item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.four-images-section--{{ section.id }} .four-images-section__item-title,
+.four-images-section--{{ section.id }} .four-images-section__item-description {
+  margin: 0;
+}
+
+@media (max-width: {{ section.settings.tablet_breakpoint }}px) {
+  .four-images-section--{{ section.id }} .four-images-section__grid {
+    grid-template-columns: repeat({{ section.settings.tablet_columns }}, 1fr) !important;
+    gap: {{ section.settings.tablet_gap_vertical }}px {{ section.settings.tablet_gap_horizontal }}px !important;
+    margin-top: 30px !important;
+  }
+  
+  .four-images-section--{{ section.id }} .four-images-section__item {
+    padding-left: {{ section.settings.card_padding_horizontal }}px !important;
+    padding-right: {{ section.settings.card_padding_horizontal }}px !important;
+  }
+}
+
+@media (max-width: {{ section.settings.mobile_breakpoint }}px) {
+  .four-images-section--{{ section.id }} .four-images-section__grid {
+    grid-template-columns: repeat({{ section.settings.mobile_columns }}, 1fr) !important;
+    gap: {{ section.settings.mobile_gap_vertical }}px {{ section.settings.mobile_gap_horizontal }}px !important;
+    margin-top: 30px !important;
+  }
+  
+  .four-images-section--{{ section.id }} .four-images-section__item {
+    padding-left: {{ section.settings.card_padding_horizontal }}px !important;
+    padding-right: {{ section.settings.card_padding_horizontal }}px !important;
+  }
+  
+  {% if section.settings.mobile_stack_layout %}
+    .four-images-section--{{ section.id }} .four-images-section__item {
+      text-align: center;
+    }
+  {% endif %}
+}
+            
+            /* Enhanced accent text styling with global and local customization options */
+            .four-images-section--{{ section.id }} .accent {
+              {% comment %} Always apply core accent text styling {% endcomment %}
+              padding: 2px 4px !important;
+              margin: -2px -4px !important;
+              display: inline-block !important;
+              margin-left: {{ section.settings.accent_text_margin_left }}px !important;
+              
+              {% comment %} Check for gradient first - it works regardless of global/local settings {% endcomment %}
+              {% if section.settings.use_theme_colors %}
+                {% comment %} Use global accent dark gradient when theme colors are enabled {% endcomment %}
+                background: {{ settings.global_accent_text_gradient_dark }} !important;
+                -webkit-background-clip: text !important;
+                -webkit-text-fill-color: transparent !important;
+                background-clip: text !important;
+                color: transparent !important;
+                line-height: 1.3 !important;
+              {% elsif section.settings.use_accent_gradient %}
+                background: {{ section.settings.accent_text_gradient }} !important;
+                -webkit-background-clip: text !important;
+                -webkit-text-fill-color: transparent !important;
+                background-clip: text !important;
+                color: transparent !important;
+                line-height: 1.3 !important;
+              {% else %}
+                {% comment %} Apply solid color based on global or local settings {% endcomment %}
+                color: {% if section.settings.use_theme_colors %}{{ settings.global_section_accent_1_color }}{% else %}{{ section.settings.accent_color | default: '#ff6b35' }}{% endif %} !important;
+              {% endif %}
+              
+              {% if section.settings.override_global_accent %}
+                {% comment %} Use section-specific typography settings when override is enabled {% endcomment %}
+                {% if section.settings.accent_font_family != 'inherit' %}
+                  {% case section.settings.accent_font_family %}
+                    {% when 'serif' %}
+                      font-family: serif !important;
+                    {% when 'Georgia Pro' %}
+                      font-family: 'Georgia Pro', serif !important;
+                    {% when 'Bodoni Moda' %}
+                      font-family: 'Bodoni Moda', serif !important;
+                    {% when 'Instrument Serif' %}
+                      font-family: 'Instrument Serif', serif !important;
+                    {% when 'DM Serif Text' %}
+                      font-family: 'DM Serif Text', serif !important;
+                    {% when 'Nothing You Could Do' %}
+                      font-family: 'Nothing You Could Do', cursive !important;
+                  {% endcase %}
+                {% else %}
+                  font-family: var(--font-accent-family, var(--font-body-family)) !important;
+                {% endif %}
+                
+                font-style: {% if section.settings.accent_font_style != 'normal' %}{{ section.settings.accent_font_style }}{% else %}var(--font-accent-style, normal){% endif %} !important;
+                font-weight: {% if section.settings.accent_font_weight != 'inherit' %}{{ section.settings.accent_font_weight }}{% else %}var(--font-accent-weight, inherit){% endif %} !important;
+                
+              {% else %}
+                {% comment %} Use global accent typography system {% endcomment %}
+                font-family: var(--font-accent-family, var(--font-body-family)) !important;
+                font-style: var(--font-accent-style, normal) !important;
+                font-weight: var(--font-accent-weight, 400) !important;
+                letter-spacing: var(--font-accent-letter-spacing, 0px) !important;
+                text-transform: var(--font-accent-text-transform, none) !important;
+              {% endif %}
+            }
+            
+            /* Global accent text styling - uses theme accent typography */
+            .four-images-section--{{ section.id }} .global-accent-text {
+              font-family: var(--font-accent-family, var(--font-body-family)) !important;
+              font-style: var(--font-accent-style, normal) !important;
+              font-weight: var(--font-accent-weight, 400) !important;
+              letter-spacing: var(--font-accent-letter-spacing, 0px) !important;
+              text-transform: var(--font-accent-text-transform, none) !important;
+            }
+            
+/* Typography system integration */
+.four-images-section--{{ section.id }} .four-images-section__heading {
+  letter-spacing: var(--letter-spacing-heading) !important;
+  font-weight: var(--font-weight-bold) !important;
+}
+
+.four-images-section--{{ section.id }} .four-images-section__subtitle {
+  letter-spacing: var(--letter-spacing-body) !important;
+  font-weight: var(--font-weight-regular) !important;
+}
+
+.four-images-section--{{ section.id }} .four-images-section__title {
+  letter-spacing: var(--letter-spacing-body) !important;
+  font-weight: var(--font-weight-bold) !important;
+}
+
+.four-images-section--{{ section.id }} .four-images-section__description {
+  letter-spacing: var(--letter-spacing-body) !important;
+  font-weight: var(--font-weight-regular) !important;
+}
+
+/* Load-in animation */
+.page-fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Add slight delay for staggered effect on multiple sections */
+.page-fade-in:nth-child(2) { animation-delay: 0.1s; }
+.page-fade-in:nth-child(3) { animation-delay: 0.2s; }
+.page-fade-in:nth-child(4) { animation-delay: 0.3s; }
+            
+            </style>
+
+{% schema %}
+{
+  "name": "4 Images",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "use_theme_colors",
+      "label": "Use Theme Colors",
+      "default": false,
+      "info": "When enabled, uses global theme colors for section background, text, and accent elements"
+    },
+    {
+      "type": "header",
+      "content": "Section Layout"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_top",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "default": 60,
+      "unit": "px",
+      "label": "Section Padding Top"
+    },
+    {
+      "type": "range",
+      "id": "section_padding_bottom",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "default": 60,
+      "unit": "px",
+      "label": "Section Padding Bottom"
+    },
+    {
+      "type": "range",
+      "id": "section_max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "default": 1600,
+      "unit": "px",
+      "label": "Section Max Width"
+    },
+    {
+      "type": "header",
+      "content": "Container"
+    },
+         {
+       "type": "range",
+       "id": "container_padding_horizontal",
+       "min": 20,
+       "max": 100,
+       "step": 5,
+       "default": 20,
+       "unit": "px",
+       "label": "Container Padding Horizontal"
+     },
+    {
+      "type": "header",
+      "content": "Main Heading"
+    },
+
+            {
+          "type": "text",
+          "id": "main_heading",
+          "label": "Main Heading",
+          "default": "Featured Products"
+        },
+        {
+          "type": "text",
+          "id": "accent_text",
+          "label": "Accent Text",
+          "info": "Optional accent text to display after the main heading"
+        },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Discover our amazing collection of products."
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "main_heading_font_size",
+      "min": 24,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "label": "Main Heading Font Size",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "subtitle_font_size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle Font Size",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "item_title_font_size",
+      "min": 14,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Item Title Font Size",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "item_description_font_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Item Description Font Size",
+      "default": 14
+    },
+
+            {
+          "type": "header",
+          "content": "Accent Text Settings"
+        },
+        {
+          "type": "checkbox",
+          "id": "override_global_accent",
+          "label": "Override Global Accent Typography",
+          "default": false,
+          "info": "When enabled, use section-specific accent typography settings below. When disabled, use the global accent typography from Theme Settings > Typography > Accent Typography."
+        },
+        {
+          "type": "checkbox",
+          "id": "use_accent_gradient",
+          "label": "Use Accent Gradient",
+          "default": false,
+          "info": "Apply gradient effect to the accent text instead of solid color"
+        },
+        {
+          "type": "color_background",
+          "id": "accent_text_gradient",
+          "label": "Accent Text Gradient",
+          "default": "linear-gradient(45deg, #EF4A65, #FF6B9D)",
+          "info": "Choose a gradient for the accent text. This setting is only used when 'Use Accent Gradient' is enabled above."
+        },
+        {
+          "type": "header",
+          "content": "Section-Specific Accent Font Settings"
+        },
+        {
+          "type": "select",
+          "id": "accent_font_family",
+          "label": "Section Accent Font Family",
+          "options": [
+            {
+              "value": "inherit",
+              "label": "Use Global Setting"
+            },
+            {
+              "value": "serif",
+              "label": "System Serif"
+            },
+            {
+              "value": "Georgia Pro",
+              "label": "Georgia Pro"
+            },
+            {
+              "value": "Bodoni Moda",
+              "label": "Bodoni Moda"
+            },
+            {
+              "value": "Instrument Serif",
+              "label": "Instrument Serif"
+            },
+            {
+              "value": "DM Serif Text",
+              "label": "DM Serif Text"
+            },
+            {
+              "value": "Nothing You Could Do",
+              "label": "Nothing You Could Do"
+            }
+          ],
+          "default": "inherit",
+          "info": "Choose a custom font family for the accent text (only used when Override Global Accent Typography is enabled)"
+        },
+        {
+          "type": "select",
+          "id": "accent_font_style",
+          "label": "Accent Text Font Style",
+          "options": [
+            {
+              "value": "normal",
+              "label": "Normal"
+            },
+            {
+              "value": "italic",
+              "label": "Italic"
+            }
+          ],
+          "default": "normal",
+          "info": "Choose the font style for the accent text"
+        },
+        {
+          "type": "select",
+          "id": "accent_font_weight",
+          "label": "Accent Text Font Weight",
+          "options": [
+            {
+              "value": "inherit",
+              "label": "Default (Inherit)"
+            },
+            {
+              "value": "300",
+              "label": "Light (300)"
+            },
+            {
+              "value": "400",
+              "label": "Normal (400)"
+            },
+            {
+              "value": "500",
+              "label": "Medium (500)"
+            },
+            {
+              "value": "600",
+              "label": "Semi Bold (600)"
+            },
+            {
+              "value": "700",
+              "label": "Bold (700)"
+            },
+            {
+              "value": "800",
+              "label": "Extra Bold (800)"
+            },
+            {
+              "value": "900",
+              "label": "Black (900)"
+            }
+          ],
+          "default": "inherit",
+          "info": "Choose the font weight (boldness) for the accent text"
+        },
+        {
+          "type": "range",
+          "id": "accent_text_margin_left",
+          "min": 0,
+          "max": 50,
+          "step": 1,
+          "unit": "px",
+          "label": "Accent Text Left Margin",
+          "default": 0
+        },
+        {
+          "type": "header",
+          "content": "Colors"
+        },
+    {
+      "type": "color",
+      "id": "section_background_color",
+      "label": "Section Background Color",
+      "default": "#FFFFFF"
+    },
+
+    {
+      "type": "color",
+      "id": "main_heading_color",
+      "label": "Main Heading Color",
+      "default": "#181818"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Subtitle Color",
+      "default": "#181818"
+    },
+    {
+      "type": "color",
+      "id": "card_background_color",
+      "label": "Card Background Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "placeholder_background_color",
+      "label": "Placeholder Background Color",
+      "default": "#F5F5F5"
+    },
+    {
+      "type": "color",
+      "id": "placeholder_text_color",
+      "label": "Placeholder Text Color",
+      "default": "#999999"
+    },
+    
+    {
+      "type": "color",
+      "id": "step_title_color",
+      "label": "Step Title Color",
+      "default": "#181818"
+    },
+            {
+          "type": "color",
+          "id": "step_description_color",
+          "label": "Step Description Color",
+          "default": "#181818"
+        },
+        {
+          "type": "color",
+          "id": "accent_color",
+          "label": "Accent Color",
+          "default": "#ff6b35",
+          "info": "Color for the accent text when not using global accent typography or gradient"
+        },
+         {
+       "type": "header",
+       "content": "Spacing"
+     },
+     {
+       "type": "range",
+       "id": "global_text_margin_bottom",
+       "min": 0,
+       "max": 100,
+       "step": 4,
+       "default": 0,
+       "unit": "px",
+       "label": "Global Text Margin Bottom",
+       "info": "Adjusts the bottom margin for all text elements"
+     },
+
+
+    {
+      "type": "range",
+      "id": "main_heading_margin_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 0,
+      "unit": "px",
+      "label": "Main Heading Margin Top"
+    },
+    {
+      "type": "range",
+      "id": "main_heading_margin_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 8,
+      "unit": "px",
+      "label": "Main Heading Margin Bottom"
+    },
+    {
+      "type": "range",
+      "id": "subtitle_margin_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 0,
+      "unit": "px",
+      "label": "Subtitle Margin Top"
+    },
+    {
+      "type": "range",
+      "id": "subtitle_margin_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 36,
+      "unit": "px",
+      "label": "Subtitle Margin Bottom"
+    },
+         {
+       "type": "header",
+       "content": "Grid Spacing"
+     },
+     {
+       "type": "range",
+       "id": "desktop_gap_vertical",
+       "min": 0,
+       "max": 80,
+       "step": 5,
+       "default": 0,
+       "unit": "px",
+       "label": "Desktop Vertical Gap"
+     },
+     {
+       "type": "range",
+       "id": "desktop_gap_horizontal",
+       "min": 0,
+       "max": 80,
+       "step": 5,
+       "default": 0,
+       "unit": "px",
+       "label": "Desktop Horizontal Gap"
+     },
+     {
+       "type": "range",
+       "id": "tablet_gap_vertical",
+       "min": 0,
+       "max": 80,
+       "step": 5,
+       "default": 30,
+       "unit": "px",
+       "label": "Tablet Vertical Gap"
+     },
+     {
+       "type": "range",
+       "id": "tablet_gap_horizontal",
+       "min": 0,
+       "max": 80,
+       "step": 5,
+       "default": 30,
+       "unit": "px",
+       "label": "Tablet Horizontal Gap"
+     },
+     {
+       "type": "range",
+       "id": "mobile_gap_vertical",
+       "min": 0,
+       "max": 80,
+       "step": 5,
+       "default": 30,
+       "unit": "px",
+       "label": "Mobile Vertical Gap"
+     },
+     {
+       "type": "range",
+       "id": "mobile_gap_horizontal",
+       "min": 0,
+       "max": 80,
+       "step": 5,
+       "default": 30,
+       "unit": "px",
+       "label": "Mobile Horizontal Gap"
+     },
+     {
+       "type": "range",
+       "id": "grid_margin_top",
+       "min": 0,
+       "max": 100,
+       "step": 2,
+       "default": 42,
+       "unit": "px",
+       "label": "Grid Margin Top"
+     },
+    {
+      "type": "range",
+      "id": "step_title_margin_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 0,
+      "unit": "px",
+      "label": "Step Title Margin Top"
+    },
+    {
+      "type": "range",
+      "id": "step_title_margin_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 0,
+      "unit": "px",
+      "label": "Step Title Margin Bottom"
+    },
+    {
+      "type": "range",
+      "id": "step_description_margin_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 0,
+      "unit": "px",
+      "label": "Step Description Margin Top"
+    },
+    {
+      "type": "range",
+      "id": "step_description_margin_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 0,
+      "unit": "px",
+      "label": "Step Description Margin Bottom"
+    },
+    {
+      "type": "header",
+      "content": "Divider Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_divider",
+      "label": "Show divider line",
+      "default": false,
+      "info": "Display a divider line between title and description"
+    },
+    {
+      "type": "range",
+      "id": "divider_width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "default": 50,
+      "unit": "%",
+      "label": "Divider width"
+    },
+    {
+      "type": "range",
+      "id": "divider_thickness",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 2,
+      "unit": "px",
+      "label": "Divider thickness"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider color",
+      "default": "#000000"
+    },
+    {
+      "type": "select",
+      "id": "divider_alignment",
+      "label": "Divider alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "divider_margin_top",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "default": 12,
+      "unit": "px",
+      "label": "Divider top margin"
+    },
+    {
+      "type": "range",
+      "id": "divider_margin_bottom",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "default": 12,
+      "unit": "px",
+      "label": "Divider bottom margin"
+    },
+         {
+       "type": "header",
+       "content": "Visual Effects"
+     },
+      {
+       "type": "range",
+       "id": "card_border_radius",
+       "min": 0,
+       "max": 40,
+       "step": 2,
+       "default": 4,
+       "unit": "px",
+       "label": "Card Border Radius"
+     },
+     {
+       "type": "range",
+       "id": "image_border_radius",
+       "min": 0,
+       "max": 40,
+       "step": 2,
+       "default": 4,
+       "unit": "px",
+       "label": "Image Border Radius"
+     },
+     {
+       "type": "range",
+       "id": "card_padding_horizontal",
+       "min": 0,
+       "max": 60,
+       "step": 2,
+       "default": 18,
+       "unit": "px",
+       "label": "Card Horizontal Padding"
+     },
+     {
+       "type": "checkbox",
+       "id": "enable_card_styling",
+       "label": "Enable Card Background & Border",
+       "default": false,
+       "info": "Apply background color, border, and padding to the entire card container"
+     },
+     {
+       "type": "range",
+       "id": "card_padding_vertical",
+       "min": 0,
+       "max": 60,
+       "step": 2,
+       "default": 20,
+       "unit": "px",
+       "label": "Card Vertical Padding",
+       "info": "Only applies when card styling is enabled"
+     },
+     {
+       "type": "range",
+       "id": "card_border_width",
+       "min": 0,
+       "max": 10,
+       "step": 1,
+       "default": 1,
+       "unit": "px",
+       "label": "Card Border Width",
+       "info": "Only applies when card styling is enabled"
+     },
+     {
+       "type": "color",
+       "id": "card_border_color",
+       "label": "Card Border Color",
+       "default": "#E5E7EB",
+       "info": "Only applies when card styling is enabled"
+     },
+           {
+        "type": "header",
+        "content": "Image Settings"
+      },
+      {
+        "type": "select",
+        "id": "image_focal_point",
+        "label": "Image Focal Point",
+        "options": [
+          { "value": "center", "label": "Center" },
+          { "value": "top", "label": "Top" },
+          { "value": "bottom", "label": "Bottom" },
+          { "value": "left", "label": "Left" },
+          { "value": "right", "label": "Right" },
+          { "value": "top-left", "label": "Top Left" },
+          { "value": "top-right", "label": "Top Right" },
+          { "value": "bottom-left", "label": "Bottom Left" },
+          { "value": "bottom-right", "label": "Bottom Right" }
+        ],
+        "default": "center",
+        "info": "Controls how the image is positioned within its container"
+      },
+
+    {
+      "type": "header",
+      "content": "Responsive Settings"
+    },
+    {
+      "type": "range",
+      "id": "desktop_columns",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 4,
+      "label": "Desktop Columns"
+    },
+    {
+      "type": "range",
+      "id": "tablet_columns",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2,
+      "label": "Tablet Columns"
+    },
+                   {
+        "type": "select",
+        "id": "mobile_columns",
+        "label": "Mobile Columns",
+        "options": [
+          { "value": "1", "label": "1 Column" },
+          { "value": "2", "label": "2 Columns" }
+        ],
+        "default": "2"
+      },
+    {
+      "type": "range",
+      "id": "tablet_breakpoint",
+      "min": 768,
+      "max": 1200,
+      "step": 16,
+      "default": 1024,
+      "unit": "px",
+      "label": "Tablet Breakpoint"
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 800,
+      "step": 16,
+      "default": 768,
+      "unit": "px",
+      "label": "Mobile Breakpoint"
+    },
+    {
+      "type": "header",
+      "content": "Mobile Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_stack_layout",
+      "label": "Stack Layout on Mobile",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "step_text_alignment",
+      "label": "Step Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+             "settings": [
+         {
+           "type": "select",
+           "id": "media_type",
+           "label": "Media Type",
+           "options": [
+             { "value": "image", "label": "Image" },
+             { "value": "video", "label": "Video" }
+           ],
+           "default": "image"
+         },
+         {
+           "type": "image_picker",
+           "id": "step_image",
+           "label": "Item Image"
+         },
+         {
+           "type": "video",
+           "id": "step_video",
+           "label": "Item Video"
+         },
+                   {
+            "type": "text",
+            "id": "step_title",
+            "label": "Item Title",
+            "default": "Product Title"
+          },
+         {
+           "type": "textarea",
+           "id": "step_description",
+           "label": "Item Description",
+           "default": "Product description goes here."
+         }
+       ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "4 Images",
+      "blocks": [
+                                   {
+            "type": "item",
+            "settings": {
+              "step_title": "Product Title",
+              "step_description": "Product description goes here. Add your content to describe this item."
+            }
+          },
+          {
+            "type": "item",
+            "settings": {
+              "step_title": "Product Title",
+              "step_description": "Product description goes here. Add your content to describe this item."
+            }
+          },
+          {
+            "type": "item",
+            "settings": {
+              "step_title": "Product Title",
+              "step_description": "Product description goes here. Add your content to describe this item."
+            }
+          },
+          {
+            "type": "item",
+            "settings": {
+              "step_title": "Product Title",
+              "step_description": "Product description goes here. Add your content to describe this item."
+            }
+          }
+      ]
+    }
+  ]
+}
+{% endschema %}

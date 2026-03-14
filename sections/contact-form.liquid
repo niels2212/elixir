@@ -1,0 +1,515 @@
+{{ 'section-contact-form.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<style>
+  /* Custom color overrides when theme colors are disabled */
+  {% unless section.settings.use_theme_colors %}
+    
+    /* Form labels and text */
+    .section-{{ section.id }}-padding .field__label,
+    .section-{{ section.id }}-padding .form__label,
+    .section-{{ section.id }}-padding .contact__field-error,
+    .section-{{ section.id }}-padding .form-status-list {
+      color: {{ section.settings.text_color }} !important;
+    }
+
+    /* Form fields */
+    .section-{{ section.id }}-padding .field__input,
+    .section-{{ section.id }}-padding .text-area {
+      background-color: {{ section.settings.field_background_color }} !important;
+      border-color: {{ section.settings.field_border_color }} !important;
+      color: {{ section.settings.field_text_color }} !important;
+    }
+
+    /* Placeholder text */
+    .section-{{ section.id }}-padding .field__input::placeholder,
+    .section-{{ section.id }}-padding .text-area::placeholder {
+      color: {{ section.settings.placeholder_color }} !important;
+    }
+
+    /* Submit button */
+    .section-{{ section.id }}-padding .button {
+      {% if section.settings.use_global_button_styling %}
+        /* Use global button styling */
+        background-color: var(--global-button-bg-color, #EF4A65) !important;
+        color: var(--global-button-text-color, #FFFFFF) !important;
+        border: var(--global-button-border-width, 1px) solid var(--global-button-border-color, var(--global-button-bg-color, #EF4A65)) !important;
+        border-radius: var(--global-button-radius, 8px) !important;
+        padding: var(--global-button-vertical-padding, 12px) var(--global-button-horizontal-padding, 24px) !important;
+        font-size: var(--global-button-font-size, 14px) !important;
+        font-weight: var(--global-button-font-weight, 700) !important;
+        text-transform: var(--global-button-text-transform, none) !important;
+        letter-spacing: var(--global-button-letter-spacing, 1px) !important;
+      {% else %}
+        /* Use custom contact form styling */
+        background-color: {{ section.settings.button_background_color }} !important;
+        color: {{ section.settings.button_text_color }} !important;
+        border: 1px solid {{ section.settings.button_background_color }} !important;
+        border-radius: 8px !important;
+        padding: 12px 24px !important;
+      {% endif %}
+    }
+
+    /* Submit button hover */
+    .section-{{ section.id }}-padding .button:hover,
+    .section-{{ section.id }}-padding .button:focus {
+      {% if section.settings.use_global_button_styling %}
+        /* Use global button hover styling */
+        background-color: var(--global-button-hover-bg-color, #D63953) !important;
+        color: var(--global-button-hover-text-color, #FFFFFF) !important;
+        border-color: var(--global-button-hover-border-color, var(--global-button-hover-bg-color, #D63953)) !important;
+        transform: translateY(-1px) !important;
+      {% else %}
+        /* Use custom contact form hover styling */
+        background-color: {{ section.settings.button_hover_background_color }} !important;
+        border: 1px solid {{ section.settings.button_hover_background_color }} !important;
+      {% endif %}
+    }
+
+    /* Success messages */
+    .section-{{ section.id }}-padding .form-status.form-status-list.form__message {
+      color: {{ section.settings.success_color }} !important;
+    }
+
+    .section-{{ section.id }}-padding .form-status.form-status-list.form__message svg {
+      fill: {{ section.settings.success_color }} !important;
+    }
+
+    /* Error messages */
+    .section-{{ section.id }}-padding .form-status.caption-large.text-body,
+    .section-{{ section.id }}-padding .contact__field-error .form__message,
+    .section-{{ section.id }}-padding .form-status-list a {
+      color: {{ section.settings.error_color }} !important;
+    }
+
+    .section-{{ section.id }}-padding .form__message svg,
+    .section-{{ section.id }}-padding .contact__field-error svg {
+      fill: {{ section.settings.error_color }} !important;
+    }
+
+    /* Error field borders */
+    .section-{{ section.id }}-padding .field--with-error .field__input {
+      border-color: {{ section.settings.error_color }} !important;
+    }
+
+    /* Focus states */
+    .section-{{ section.id }}-padding .field__input:focus,
+    .section-{{ section.id }}-padding .text-area:focus {
+      border-color: {{ section.settings.button_background_color }} !important;
+      box-shadow: 0 0 0 1px {{ section.settings.button_background_color | color_modify: 'alpha', 0.3 }} !important;
+    }
+
+  {% endunless %}
+
+  {% comment %} Custom Border Radius Override {% endcomment %}
+  {% if section.settings.override_global_border_radius %}
+    /* Set CSS variables for contact form border radius override */
+    :root {
+      --contact-input-radius: {{ section.settings.input_border_radius }}px;
+      --contact-textarea-radius: {{ section.settings.textarea_border_radius }}px;
+    }
+    
+    /* ULTRA HIGH SPECIFICITY OVERRIDE - Contact Form Section {{ section.id }} */
+    html body section#shopify-section-{{ section.id }}.section div.contact.page-width.page-width--narrow .field .field__input:not(textarea),
+    html body section#shopify-section-{{ section.id }}.section div.contact.page-width.page-width--narrow input[type="text"],
+    html body section#shopify-section-{{ section.id }}.section div.contact.page-width.page-width--narrow input[type="email"],
+    html body section#shopify-section-{{ section.id }}.section div.contact.page-width.page-width--narrow input[type="tel"],
+    html body section#shopify-section-{{ section.id }}.section div.contact.page-width.page-width--narrow input[type="password"],
+    html body section#shopify-section-{{ section.id }}.section div.contact.page-width.page-width--narrow input[type="search"],
+    html body section#shopify-section-{{ section.id }} form#ContactForm input.field__input:not(textarea) {
+      border-radius: {{ section.settings.input_border_radius }}px !important;
+    }
+
+    /* OVERRIDE PSEUDO-ELEMENTS - Input Fields */
+    html body section#shopify-section-{{ section.id }}.section div.contact.page-width.page-width--narrow .field:after,
+    html body section#shopify-section-{{ section.id }}.section div.contact.page-width.page-width--narrow .select:after,
+    html body section#shopify-section-{{ section.id }} form#ContactForm .field:after,
+    html body section#shopify-section-{{ section.id }} form#ContactForm .select:after {
+      border-radius: {{ section.settings.input_border_radius }}px !important;
+    }
+
+    /* ULTRA HIGH SPECIFICITY OVERRIDE - Textarea */
+    html body section#shopify-section-{{ section.id }}.section div.contact.page-width.page-width--narrow textarea,
+    html body section#shopify-section-{{ section.id }}.section div.contact.page-width.page-width--narrow .text-area,
+    html body section#shopify-section-{{ section.id }}.section div.contact.page-width.page-width--narrow textarea.field__input,
+    html body section#shopify-section-{{ section.id }}.section div.contact.page-width.page-width--narrow #ContactForm-body,
+    html body section#shopify-section-{{ section.id }} form#ContactForm textarea,
+    html body section#shopify-section-{{ section.id }} form#ContactForm #ContactForm-body {
+      border-radius: {{ section.settings.textarea_border_radius }}px !important;
+    }
+
+    /* OVERRIDE PSEUDO-ELEMENTS - Textarea Fields */
+    html body section#shopify-section-{{ section.id }}.section div.contact.page-width.page-width--narrow .field:has(textarea):after,
+    html body section#shopify-section-{{ section.id }}.section div.contact.page-width.page-width--narrow .field:has(.text-area):after,
+    html body section#shopify-section-{{ section.id }} form#ContactForm .field:has(textarea):after,
+    html body section#shopify-section-{{ section.id }} form#ContactForm .field:has(.text-area):after {
+      border-radius: {{ section.settings.textarea_border_radius }}px !important;
+    }
+  {% endif %}
+
+  /* Custom fix: Maintain field border on focus with global text color */
+  .field:focus-within:after {
+    box-shadow: 0 0 0 var(--inputs-border-width) color-mix(in srgb, var(--global-section-text-color) 50%, transparent) !important;
+  }
+</style>
+
+<div class="" style="background-color: {% if section.settings.use_theme_colors %}{{ settings.global_section_background_color }}{% else %}{{ section.settings.background_color }}{% endif %};">
+  <div class="contact page-width page-width--narrow section-{{ section.id }}-padding">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="title title-wrapper--no-top-margin inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" style="color: {% if section.settings.use_theme_colors %}{{ settings.global_section_text_color }}{% else %}{{ section.settings.heading_color }}{% endif %} !important;">
+        {{ section.settings.heading }}
+      </h2>
+    {%- else -%}
+      <h2 class="visually-hidden">{{ 'templates.contact.form.title' | t }}</h2>
+    {%- endif -%}
+    {%- liquid
+      assign contact_form_class = 'isolate'
+      if settings.animations_reveal_on_scroll
+        assign contact_form_class = 'isolate scroll-trigger animate--slide-in'
+      endif
+    -%}
+    {%- form 'contact', id: 'ContactForm', class: contact_form_class -%}
+      {%- if form.posted_successfully? -%}
+        <h2 class="form-status form-status-list form__message" tabindex="-1" autofocus>
+          {{- 'icon-success.svg' | inline_asset_content -}}
+          {{ 'templates.contact.form.post_success' | t }}
+        </h2>
+      {%- elsif form.errors -%}
+        <div class="form__message">
+          <h2 class="form-status caption-large text-body" role="alert" tabindex="-1" autofocus>
+            {{- 'icon-error.svg' | inline_asset_content -}}
+            {{ 'templates.contact.form.error_heading' | t }}
+          </h2>
+        </div>
+        <ul class="form-status-list caption-large" role="list">
+          <li>
+            <a href="#ContactForm-email" class="link">
+              {{ form.errors.translated_fields.email | capitalize }}
+              {{ form.errors.messages.email }}
+            </a>
+          </li>
+        </ul>
+      {%- endif -%}
+      <div class="contact__fields">
+        <div class="field">
+          <input
+            class="field__input"
+            autocomplete="name"
+            type="text"
+            id="ContactForm-name"
+            name="contact[{{ 'templates.contact.form.name' | t }}]"
+            value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+            placeholder="{{ 'templates.contact.form.name' | t }}"
+          >
+          <label class="field__label" for="ContactForm-name">{{ 'templates.contact.form.name' | t }}</label>
+        </div>
+        <div class="field field--with-error">
+          <input
+            autocomplete="email"
+            type="email"
+            id="ContactForm-email"
+            class="field__input"
+            name="contact[email]"
+            spellcheck="false"
+            autocapitalize="off"
+            value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+            aria-required="true"
+            {% if form.errors contains 'email' %}
+              aria-invalid="true"
+              aria-describedby="ContactForm-email-error"
+            {% endif %}
+            placeholder="{{ 'templates.contact.form.email' | t }}"
+          >
+          <label class="field__label" for="ContactForm-email">
+            {{- 'templates.contact.form.email' | t }}
+            <span aria-hidden="true">*</span></label
+          >
+          {%- if form.errors contains 'email' -%}
+            <small class="contact__field-error" id="ContactForm-email-error">
+              <span class="visually-hidden">{{ 'accessibility.error' | t }}</span>
+              <span class="form__message">
+                <span class="svg-wrapper">
+                  {{- 'icon-error.svg' | inline_asset_content -}}
+                </span>
+                {{- form.errors.translated_fields.email | capitalize }}
+                {{ form.errors.messages.email -}}
+              </span>
+            </small>
+          {%- endif -%}
+        </div>
+      </div>
+      <div class="field">
+        <input
+          type="tel"
+          id="ContactForm-phone"
+          class="field__input"
+          autocomplete="tel"
+          name="contact[{{ 'templates.contact.form.phone' | t }}]"
+          pattern="[0-9\-]*"
+          value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+          placeholder="{{ 'templates.contact.form.phone' | t }}"
+        >
+        <label class="field__label" for="ContactForm-phone">{{ 'templates.contact.form.phone' | t }}</label>
+      </div>
+      <div class="field">
+        <textarea
+          rows="10"
+          id="ContactForm-body"
+          class="text-area field__input"
+          name="contact[{{ 'templates.contact.form.comment' | t }}]"
+          placeholder="{{ 'templates.contact.form.comment' | t }}"
+        >
+          {{- form.body -}}
+        </textarea>
+        <label class="form__label field__label" for="ContactForm-body">
+          {{- 'templates.contact.form.comment' | t -}}
+        </label>
+      </div>
+      <div class="contact__button">
+        <button type="submit" class="button{% unless section.settings.use_global_button_styling %} disable-global-button-styling{% endunless %}">
+          {{ 'templates.contact.form.send' | t }}
+        </button>
+      </div>
+    {%- endform -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.contact-form.name",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "use_theme_colors",
+      "label": "Use Theme Colors",
+      "default": true,
+      "info": "When disabled, you can customize all colors below"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "default": "t:sections.contact-form.settings.title.default",
+      "label": "t:sections.contact-form.settings.title.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        {
+          "value": "h2",
+          "label": "t:sections.all.heading_size.options__1.label"
+        },
+        {
+          "value": "h1",
+          "label": "t:sections.all.heading_size.options__2.label"
+        },
+        {
+          "value": "h0",
+          "label": "t:sections.all.heading_size.options__3.label"
+        },
+        {
+          "value": "hxl",
+          "label": "t:sections.all.heading_size.options__4.label"
+        },
+        {
+          "value": "hxxl",
+          "label": "t:sections.all.heading_size.options__5.label"
+        }
+      ],
+      "default": "h1",
+      "label": "t:sections.all.heading_size.label"
+    },
+    {
+      "type": "header",
+      "content": "Custom Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section Background Color",
+      "default": "#FFFFFF",
+      "info": "Used when theme colors are disabled"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#000000",
+      "info": "Used when theme colors are disabled"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000",
+      "info": "Used for labels and general text when theme colors are disabled"
+    },
+    {
+      "type": "header",
+      "content": "Form Field Colors"
+    },
+    {
+      "type": "color",
+      "id": "field_background_color",
+      "label": "Field Background Color",
+      "default": "#FFFFFF",
+      "info": "Background color for input fields when theme colors are disabled"
+    },
+    {
+      "type": "color",
+      "id": "field_border_color",
+      "label": "Field Border Color",
+      "default": "#E5E5E5",
+      "info": "Border color for input fields when theme colors are disabled"
+    },
+    {
+      "type": "color",
+      "id": "field_text_color",
+      "label": "Field Text Color",
+      "default": "#000000",
+      "info": "Text color inside input fields when theme colors are disabled"
+    },
+    {
+      "type": "color",
+      "id": "placeholder_color",
+      "label": "Placeholder Text Color",
+      "default": "#999999",
+      "info": "Color for placeholder text when theme colors are disabled"
+    },
+    {
+      "type": "header",
+      "content": "Button Colors"
+    },
+    {
+      "type": "color",
+      "id": "button_background_color",
+      "label": "Button Background Color",
+      "default": "#000000",
+      "info": "Submit button background color when theme colors are disabled"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button Text Color",
+      "default": "#FFFFFF",
+      "info": "Submit button text color when theme colors are disabled"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background_color",
+      "label": "Button Hover Background Color",
+      "default": "#333333",
+      "info": "Submit button background color on hover when theme colors are disabled"
+    },
+    {
+      "type": "header",
+      "content": "Message Colors"
+    },
+    {
+      "type": "color",
+      "id": "success_color",
+      "label": "Success Message Color",
+      "default": "#28A745",
+      "info": "Color for success messages when theme colors are disabled"
+    },
+    {
+      "type": "color",
+      "id": "error_color",
+      "label": "Error Message Color",
+      "default": "#DC3545",
+      "info": "Color for error messages when theme colors are disabled"
+    },
+    {
+      "type": "header",
+      "content": "Button Styling"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_global_button_styling",
+      "label": "Use Global Button Styling",
+      "default": false,
+      "info": "Enable to use theme's global button styling instead of custom colors"
+    },
+    {
+      "type": "header",
+      "content": "Form Field Styling"
+    },
+    {
+      "type": "checkbox",
+      "id": "override_global_border_radius",
+      "label": "Override Global Border Radius",
+      "default": false,
+      "info": "Enable to customize form field border radius independently"
+    },
+    {
+      "type": "range",
+      "id": "input_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Input Field Border Radius",
+      "default": 8,
+      "info": "Border radius for text inputs, email, phone fields"
+    },
+    {
+      "type": "range",
+      "id": "textarea_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Comment Field Border Radius",
+      "default": 4,
+      "info": "Border radius for the comment textarea field"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 36
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.contact-form.presets.name"
+    }
+  ]
+}
+{% endschema %}

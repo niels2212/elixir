@@ -1,0 +1,830 @@
+
+{%- liquid
+    assign heading = section.settings.heading | escape
+    assign blocks_count = section.blocks.size
+    assign desktop_cols = section.settings.desktop_columns
+    if blocks_count < desktop_cols
+      assign desktop_cols = blocks_count
+    endif
+  -%}
+  
+  <style>
+  .section-{{ section.id }} {
+    background-color: {{ section.settings.section_background_color }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  /* Desktop margins */
+  @media (min-width: {{ section.settings.mobile_breakpoint | plus: 1 }}px) {
+    .section-{{ section.id }} {
+      margin-top: {{ section.settings.desktop_margin_top }}px;
+      margin-bottom: {{ section.settings.desktop_margin_bottom }}px;
+    }
+  }
+
+  /* Mobile margins */
+  @media (max-width: {{ section.settings.mobile_breakpoint }}px) {
+    .section-{{ section.id }} {
+      margin-top: {{ section.settings.mobile_margin_top }}px;
+      margin-bottom: {{ section.settings.mobile_margin_bottom }}px;
+    }
+  }
+  
+  .section-{{ section.id }} .container {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding-top: {{ section.settings.container_padding_top }}px;
+    padding-bottom: {{ section.settings.container_padding_bottom }}px;
+    padding-left: {{ section.settings.container_padding_left }}px;
+    padding-right: {{ section.settings.container_padding_right}}px;
+    border-radius: {{ section.settings.border_radius }}px;
+  }
+  
+  {% if section.settings.container_background_type == 'color' %}
+    @media screen and (max-width: 749px) {
+      .section-{{ section.id }} .container {
+        background: {{ section.settings.container_background_color_mobile }};
+      }
+    }
+    @media screen and (min-width: 750px) {
+      .section-{{ section.id }} .container {
+        background: {{ section.settings.container_background_color_desktop }};
+      }
+    }
+  {% else %}
+    @media screen and (max-width: 749px) {
+      .section-{{ section.id }} .container {
+        {% if section.settings.container_background_image_mobile %}
+          background-image: url('{{ section.settings.container_background_image_mobile | image_url }}');
+          background-size: cover;
+          background-position: center;
+        {% else %}
+          background: {{ section.settings.container_background_color_mobile }};
+        {% endif %}
+      }
+    }
+    @media screen and (min-width: 750px) {
+      .section-{{ section.id }} .container {
+        {% if section.settings.container_background_image_desktop %}
+          background-image: url('{{ section.settings.container_background_image_desktop | image_url }}');
+          background-size: cover;
+          background-position: center;
+        {% else %}
+          background: {{ section.settings.container_background_color_desktop }};
+        {% endif %}
+      }
+    }
+  {% endif %}
+  
+  .section-{{ section.id }} .layout-wrapper {
+    display: flex;
+    align-items: stretch; /* stretch children to equal row height */
+    flex-wrap: nowrap; /* keep heading and grid on the same row */
+  }
+
+  /* Desktop layout gap */
+  @media (min-width: {{ section.settings.mobile_breakpoint | plus: 1 }}px) {
+    .section-{{ section.id }} .layout-wrapper {
+      gap: {{ section.settings.desktop_layout_gap }}px;
+    }
+  }
+
+  /* Mobile layout gap */
+  @media (max-width: {{ section.settings.mobile_breakpoint }}px) {
+    .section-{{ section.id }} .layout-wrapper {
+      gap: {{ section.settings.mobile_layout_gap }}px;
+    }
+  }
+  
+  .section-{{ section.id }} .heading {
+    flex: 0 0 25%; /* keep heading as a column in the same row */
+    display: flex; /* center heading inside its column */
+    justify-content: flex-start; /* left align horizontally */
+    align-items: center; /* vertical center within row height */
+    font-weight: 700;
+    font-size: {{ section.settings.heading_size_desktop }}px;
+    line-height: {{ section.settings.heading_line_height }};
+    letter-spacing: var(--letter-spacing-heading);
+    color: {{ section.settings.heading_color }} !important;
+    text-align: left; /* left align text */
+    margin-bottom: 0;
+  }
+  
+  .section-{{ section.id }} .features-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat({{ desktop_cols }}, 1fr);
+    gap: {{ section.settings.gap }}px !important;
+  }
+  
+  .section-{{ section.id }} .feature-item {
+    text-align: {{ section.settings.text_alignment }};
+    display: flex;
+    flex-direction: column;
+    min-height: fit-content;
+    position: relative;
+  }
+  
+  .section-{{ section.id }} .feature-item > * {
+    position: static;
+    z-index: auto;
+  }
+  
+  .section-{{ section.id }} .feature-icon {
+    flex-shrink: 0;
+    margin-bottom: {{ section.settings.icon_size | times: 0.4 | round }}px;
+    {% if section.settings.icon_alignment == 'left' %}
+      align-self: flex-start;
+    {% elsif section.settings.icon_alignment == 'center' %}
+      align-self: center;
+    {% elsif section.settings.icon_alignment == 'right' %}
+      align-self: flex-end;
+    {% endif %}
+    min-height: {{ section.settings.icon_size }}px; /* reserve space on desktop */
+    line-height: {{ section.settings.icon_size }}px;
+  }
+  
+  .section-{{ section.id }} .feature-icon img {
+    display: block;
+    width: {{ section.settings.icon_size }}px;
+    height: auto;
+    margin: 0;
+  }
+  
+  .section-{{ section.id }} .feature-icon svg {
+    display: block;
+    width: {{ section.settings.icon_size }}px;
+    height: auto;
+  }
+  .section-{{ section.id }} .feature-icon svg * {
+    position: static !important;
+  }
+  
+  .section-{{ section.id }} .feature-title {
+    font-weight: 700;
+    font-size: {{ section.settings.feature_title_size }}px;
+    line-height: {{ section.settings.sub_line_height }};
+    letter-spacing: var(--letter-spacing-body);
+    color: {{ section.settings.title_color }} !important;
+    margin-bottom: 5px;
+    margin-top: 6px; /* ensure space below icon on desktop */
+  }
+  
+  .section-{{ section.id }} .feature-desc {
+    font-weight: 400;
+    font-size: {{ section.settings.feature_desc_size }}px;
+    line-height: {{ section.settings.body_line_height }};
+    letter-spacing: var(--letter-spacing-body);
+    color: {{ section.settings.desc_color }} !important;
+  }
+  
+  @media (max-width: {{ section.settings.tablet_breakpoint }}px) {
+    .section-{{ section.id }} .features-grid {
+      grid-template-columns: repeat({{ section.settings.tablet_columns }}, 1fr);
+      gap: {{ section.settings.gap }}px !important;
+    }
+  }
+  
+  @media (max-width: {{ section.settings.mobile_breakpoint }}px) {
+    .section-{{ section.id }} {
+      padding-left: {{ section.settings.mobile_section_padding_left }}px;
+      padding-right: {{ section.settings.mobile_section_padding_right }}px;
+    }
+    .section-{{ section.id }} .layout-wrapper {
+      flex-direction: column; /* stack on mobile */
+      flex-wrap: wrap;
+    }
+    .section-{{ section.id }} .heading {
+      flex: none;
+      width: 100%;
+      font-size: {{ section.settings.heading_size_mobile }}px;
+    }
+    .section-{{ section.id }} .features-grid {
+      grid-template-columns: repeat({{ section.settings.mobile_columns }}, 1fr);
+      gap: {{ section.settings.gap | times: 1.2 | round }}px !important;
+    }
+    .section-{{ section.id }} .feature-item {
+      min-height: auto;
+      height: auto;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+    }
+    .section-{{ section.id }} .feature-item > * {
+      position: static !important;
+      z-index: auto !important;
+    }
+    .section-{{ section.id }} .feature-item {
+      row-gap: 10px !important;
+    }
+    .section-{{ section.id }} .feature-icon {
+      margin-bottom: {{ section.settings.icon_size | times: 0.8 | round }}px;
+      position: static !important;
+      width: 100%;
+      display: block;
+      align-self: flex-start !important;
+      height: {{ section.settings.icon_size }}px !important; /* reserve vertical space for icon */
+      line-height: {{ section.settings.icon_size }}px !important;
+    }
+    .section-{{ section.id }} .feature-icon img {
+      position: static !important;
+      display: block !important;
+      float: none !important;
+      clear: both !important;
+      width: {{ section.settings.icon_size }}px !important;
+      height: auto !important;
+      margin: 0 !important;
+    }
+    .section-{{ section.id }} .feature-icon svg {
+      position: static !important;
+      display: block !important;
+      float: none !important;
+      clear: both !important;
+      width: {{ section.settings.icon_size }}px !important;
+      height: auto !important;
+      margin: 0 !important;
+    }
+    .section-{{ section.id }} .feature-icon svg * {
+      position: static !important;
+    }
+    .section-{{ section.id }} .feature-title {
+      margin-top: 6px !important;
+      position: static !important;
+      width: 100% !important;
+      clear: both !important;
+      float: none !important;
+      padding-top: 4px !important; /* small fallback spacing in case icon overlaps */
+    }
+    .section-{{ section.id }} .feature-desc {
+      position: static !important;
+      width: 100% !important;
+      clear: both !important;
+      float: none !important;
+      margin-top: 5px !important;
+    }
+  }
+  </style>
+  
+  <section class="section-{{ section.id }}">
+    <div class="container">
+      <div class="layout-wrapper">
+        {%- if heading != blank -%}
+          <h2 class="heading">{{ heading }}</h2>
+        {%- endif -%}
+        {%- if section.blocks.size > 0 -%}
+          <div class="features-grid">
+            {%- for block in section.blocks -%}
+              <div class="feature-item" {{ block.shopify_attributes }}>
+                {%- if block.settings.icon != blank -%}
+                  <div class="feature-icon">
+                    <img src="{{ block.settings.icon | image_url: width: section.settings.icon_size }}" alt="{{ block.settings.title | escape }}" loading="lazy">
+                  </div>
+                {%- endif -%}
+                {%- if block.settings.title != blank -%}
+                  <h3 class="feature-title">{{ block.settings.title | escape }}</h3>
+                {%- endif -%}
+                {%- if block.settings.description != blank -%}
+                  <p class="feature-desc">{{ block.settings.description | escape }}</p>
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </section>
+  
+  {% schema %}
+  {
+    "name": "Features",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Section Layout"
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 200,
+        "step": 10,
+        "default": 60,
+        "unit": "px",
+        "label": "Padding top"
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 200,
+        "step": 10,
+        "default": 60,
+        "unit": "px",
+        "label": "Padding bottom"
+      },
+      {
+        "type": "range",
+        "id": "desktop_margin_top",
+        "min": 0,
+        "max": 150,
+        "step": 5,
+        "default": 0,
+        "unit": "px",
+        "label": "Desktop Top Margin",
+        "info": "Top margin for desktop screens"
+      },
+      {
+        "type": "range",
+        "id": "desktop_margin_bottom",
+        "min": 0,
+        "max": 150,
+        "step": 5,
+        "default": 0,
+        "unit": "px",
+        "label": "Desktop Bottom Margin",
+        "info": "Bottom margin for desktop screens"
+      },
+      {
+        "type": "range",
+        "id": "mobile_margin_top",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "default": 0,
+        "unit": "px",
+        "label": "Mobile Top Margin",
+        "info": "Top margin for mobile screens"
+      },
+      {
+        "type": "range",
+        "id": "mobile_margin_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "default": 0,
+        "unit": "px",
+        "label": "Mobile Bottom Margin",
+        "info": "Bottom margin for mobile screens"
+      },
+      {
+        "type": "header",
+        "content": "Mobile Section Padding"
+      },
+      {
+        "type": "range",
+        "id": "mobile_section_padding_left",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "default": 20,
+        "unit": "px",
+        "label": "Mobile section padding left",
+        "info": "Horizontal padding outside the container on mobile"
+      },
+      {
+        "type": "range",
+        "id": "mobile_section_padding_right",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "default": 20,
+        "unit": "px",
+        "label": "Mobile section padding right",
+        "info": "Horizontal padding outside the container on mobile"
+      },
+      {
+        "type": "range",
+        "id": "max_width",
+        "min": 800,
+        "max": 1600,
+        "step": 50,
+        "default": 1100,
+        "unit": "px",
+        "label": "Max width"
+      },
+      {
+        "type": "color",
+        "id": "section_background_color",
+        "default": "#F8FAFC",
+        "label": "Section background color"
+      },
+      {
+        "type": "range",
+        "id": "gap",
+        "min": 10,
+        "max": 80,
+        "step": 5,
+        "default": 20,
+        "unit": "px",
+        "label": "Gap between items"
+      },
+      {
+        "type": "range",
+        "id": "desktop_layout_gap",
+        "min": 20,
+        "max": 120,
+        "step": 10,
+        "default": 40,
+        "unit": "px",
+        "label": "Desktop layout gap",
+        "info": "Gap between heading and features grid on desktop"
+      },
+      {
+        "type": "range",
+        "id": "mobile_layout_gap",
+        "min": 20,
+        "max": 80,
+        "step": 5,
+        "default": 30,
+        "unit": "px",
+        "label": "Mobile layout gap",
+        "info": "Gap between heading and features grid on mobile"
+      },
+      {
+        "type": "range",
+        "id": "icon_size",
+        "min": 20,
+        "max": 100,
+        "step": 5,
+        "default": 30,
+        "unit": "px",
+        "label": "Icon size"
+      },
+      {
+        "type": "header",
+        "content": "Container"
+      },
+      {
+        "type": "select",
+        "id": "container_background_type",
+        "options": [
+          {
+            "value": "color",
+            "label": "Color"
+          },
+          {
+            "value": "image",
+            "label": "Image"
+          }
+        ],
+        "default": "color",
+        "label": "Background type"
+      },
+      {
+        "type": "color_background",
+        "id": "container_background_color_desktop",
+        "default": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "label": "Desktop background"
+      },
+      {
+        "type": "color_background",
+        "id": "container_background_color_mobile",
+        "default": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "label": "Mobile background"
+      },
+      {
+        "type": "image_picker",
+        "id": "container_background_image_desktop",
+        "label": "Desktop background image"
+      },
+      {
+        "type": "image_picker",
+        "id": "container_background_image_mobile",
+        "label": "Mobile background image"
+      },
+      {
+        "type": "range",
+        "id": "border_radius",
+        "min": 0,
+        "max": 40,
+        "step": 2,
+        "default": 8,
+        "unit": "px",
+        "label": "Border radius"
+      },
+      {
+        "type": "range",
+        "id": "container_padding_top",
+        "min": 20,
+        "max": 100,
+        "step": 5,
+        "default": 40,
+        "unit": "px",
+        "label": "Container top padding"
+      },
+      {
+        "type": "range",
+        "id": "container_padding_bottom",
+        "min": 20,
+        "max": 100,
+        "step": 5,
+        "default": 40,
+        "unit": "px",
+        "label": "Container bottom padding"
+      },
+      {
+        "type": "range",
+        "id": "container_padding_left",
+        "min": 20,
+        "max": 100,
+        "step": 5,
+        "default": 40,
+        "unit": "px",
+        "label": "Container left padding"
+      },
+      {
+        "type": "range",
+        "id": "container_padding_right",
+        "min": 20,
+        "max": 100,
+        "step": 5,
+        "default": 40,
+        "unit": "px",
+        "label": "Container right padding"
+      },
+      {
+        "type": "header",
+        "content": "Main Heading"
+      },
+      {
+        "type": "text",
+        "id": "heading",
+        "default": "Why Choose Us",
+        "label": "Heading"
+      },
+      {
+        "type": "header",
+        "content": "Typography"
+      },
+  
+      {
+        "type": "range",
+        "id": "heading_size_desktop",
+        "min": 12,
+        "max": 72,
+        "step": 1,
+        "default": 36,
+        "unit": "px",
+        "label": "Heading font size (Desktop)"
+      },
+      {
+        "type": "range",
+        "id": "heading_size_mobile",
+        "min": 12,
+        "max": 48,
+        "step": 1,
+        "default": 28,
+        "unit": "px",
+        "label": "Heading font size (Mobile)"
+      },
+      {
+        "type": "range",
+        "id": "feature_title_size",
+        "min": 12,
+        "max": 72,
+        "step": 1,
+        "default": 18,
+        "unit": "px",
+        "label": "Feature title font size"
+      },
+      {
+        "type": "range",
+        "id": "feature_desc_size",
+        "min": 12,
+        "max": 72,
+        "step": 1,
+        "default": 13,
+        "unit": "px",
+        "label": "Feature description font size"
+      },
+  
+      {
+        "type": "range",
+        "id": "heading_line_height",
+        "min": 1,
+        "max": 2,
+        "step": 0.1,
+        "default": 1.2,
+        "label": "Heading line height"
+      },
+      {
+        "type": "range",
+        "id": "sub_line_height",
+        "min": 1,
+        "max": 2,
+        "step": 0.1,
+        "default": 1.2,
+        "label": "Subheading line height"
+      },
+      {
+        "type": "range",
+        "id": "body_line_height",
+        "min": 1,
+        "max": 2,
+        "step": 0.1,
+        "default": 1.5,
+        "label": "Body line height"
+      },
+      {
+        "type": "select",
+        "id": "heading_alignment",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "left",
+        "label": "Heading alignment"
+      },
+      {
+        "type": "select",
+        "id": "text_alignment",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "left",
+        "label": "Text alignment"
+      },
+      {
+        "type": "select",
+        "id": "icon_alignment",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ],
+        "default": "left",
+        "label": "Icon alignment"
+      },
+      {
+        "type": "color",
+        "id": "heading_color",
+        "default": "#FFFFFF",
+        "label": "Heading color"
+      },
+      {
+        "type": "color",
+        "id": "title_color",
+        "default": "#FFFFFF",
+        "label": "Title color"
+      },
+      {
+        "type": "color",
+        "id": "desc_color",
+        "default": "#F1F5F9",
+        "label": "Description color"
+      },
+      {
+        "type": "header",
+        "content": "Responsive Settings"
+      },
+      {
+        "type": "range",
+        "id": "desktop_columns",
+        "min": 1,
+        "max": 6,
+        "step": 1,
+        "default": 4,
+        "label": "Desktop columns"
+      },
+      {
+        "type": "range",
+        "id": "tablet_columns",
+        "min": 1,
+        "max": 4,
+        "step": 1,
+        "default": 2,
+        "label": "Tablet columns"
+      },
+      {
+        "type": "select",
+        "id": "mobile_columns",
+        "options": [
+          {
+            "value": "1",
+            "label": "1"
+          },
+          {
+            "value": "2",
+            "label": "2"
+          }
+        ],
+        "default": "1",
+        "label": "Mobile columns"
+      },
+      {
+        "type": "range",
+        "id": "tablet_breakpoint",
+        "min": 600,
+        "max": 1200,
+        "step": 8,
+        "default": 1024,
+        "unit": "px",
+        "label": "Tablet breakpoint"
+      },
+      {
+        "type": "range",
+        "id": "mobile_breakpoint",
+        "min": 303,
+        "max": 803,
+        "step": 5,
+        "default": 768,
+        "unit": "px",
+        "label": "Mobile breakpoint"
+      },
+  
+  
+    ],
+    "blocks": [
+      {
+        "type": "feature",
+        "name": "Feature",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "icon",
+            "label": "Icon (png, svg)"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "default": "Fast & Free Shipping",
+            "label": "Title"
+          },
+          {
+            "type": "text",
+            "id": "description",
+            "default": "Get your orders delivered quickly with our reliable shipping service.",
+            "label": "Description"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Features",
+        "blocks": [
+          {
+            "type": "feature",
+            "settings": {
+              "title": "Fast & Free Shipping",
+              "description": "Get your orders delivered quickly with our reliable shipping service."
+            }
+          },
+          {
+            "type": "feature",
+            "settings": {
+              "title": "24/7 Customer Support",
+              "description": "Our dedicated team is here to help you anytime, day or night."
+            }
+          },
+          {
+            "type": "feature",
+            "settings": {
+              "title": "30-Day Money Back",
+              "description": "Not satisfied? Get a full refund within 30 days, no questions asked."
+            }
+          },
+          {
+            "type": "feature",
+            "settings": {
+              "title": "Secure Payments",
+              "description": "Shop with confidence using our encrypted and secure payment system."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  {% endschema %}
+  

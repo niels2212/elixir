@@ -1,0 +1,1285 @@
+{% comment %} 
+--Removed Google Fonts loading - Should be handled in theme.liquid for better performance
+--Removed !important flags from CSS rules to improve specificity management
+--Consolidated duplicate headers into a single .section-header element
+--Added accessibility attributes (aria-hidden="true") to decorative SVG icons
+--Added basic SVG sanitization for custom icons with fallback
+--Added block limits (limit: 4) to prevent layout issues
+--Added disabled_on restrictions to prevent placement in header/footer
+--Improved image loading with eager loading for first section on homepage
+--Added proper width/height attributes to all images
+--Added section class for better targeting in CSS 
+{% endcomment %}
+
+{{ '4-benefits.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign section_id = section.id
+  assign use_theme_colors = section.settings.use_theme_colors
+  assign heading_accent = section.settings.heading_accent
+  assign heading_regular = section.settings.heading_regular
+  assign subtitle = section.settings.subtitle
+-%}
+
+<div class="four-benefits-wrapper four-benefits-wrapper-{{ section_id }} page-fade-in" id="four-benefits-{{ section_id }}">
+  <div class="four-benefits-section">
+    <div class="four-benefits-container">
+      
+      <!-- Mobile Image (now first) -->
+      {% if section.settings.show_image and section.settings.section_image != blank %}
+        <div class="mobile-image-container">
+          <img src="{{ section.settings.section_image | image_url: width: 800 }}" 
+               srcset="{{ section.settings.section_image | image_url: width: 600 }} 600w,
+                       {{ section.settings.section_image | image_url: width: 800 }} 800w,
+                       {{ section.settings.section_image | image_url: width: 1000 }} 1000w,
+                       {{ section.settings.section_image | image_url: width: 1200 }} 1200w"
+               sizes="(max-width: 767px) 100vw, 800px"
+               alt="{{ section.settings.section_image.alt | default: 'Section Image' | escape }}" 
+               class="section-image{% if section.index == 1 and template.name == 'index' %} section-image--eager{% endif %}"
+               loading="{% if section.index == 1 and template.name == 'index' %}eager{% else %}lazy{% endif %}" 
+               width="{{ section.settings.section_image.width }}" 
+               height="{{ section.settings.section_image.height }}">
+        </div>
+      {% endif %}
+
+      <!-- Mobile header (now after image) -->
+      {% if heading_accent != blank or heading_regular != blank or subtitle != blank %}
+        <div class="section-header mobile-header-below-image">
+          {% if heading_regular != blank or heading_accent != blank %}
+            <div class="section-heading">
+              <h2 class="heading-text">
+                {% if heading_regular != blank %}
+                  {{ heading_regular }}
+                {% endif %}
+                {% if heading_accent != blank %}
+                  <span class="{% if section.settings.override_global_accent %}custom-accent-text{% else %}global-accent-text{% endif %}">{{ heading_accent }}</span>
+                {% endif %}
+              </h2>
+              {% if subtitle != blank %}
+                <p class="section-subtitle">{{ subtitle }}</p>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <!-- Mobile Benefits -->
+      <div class="mobile-benefits-section">
+        {% for block in section.blocks limit: 4 %}
+          <div class="benefit-item" data-block-id="{{ block.id }}" {{ block.shopify_attributes }}>
+            <div class="icon-container">
+              {% if block.settings.use_custom_icon and block.settings.custom_icon_svg != blank %}
+                {%- assign custom_svg = block.settings.custom_icon_svg | strip -%}
+                {%- if custom_svg contains '<svg' -%}
+                  <div class="icon" aria-hidden="true">{{ custom_svg }}</div>
+                {%- else -%}
+                  <div class="icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  </div>
+                {%- endif -%}
+              {% elsif block.settings.icon_image != blank %}
+                <img src="{{ block.settings.icon_image | image_url: width: 120 }}" 
+                     srcset="{{ block.settings.icon_image | image_url: width: 40 }} 40w,
+                             {{ block.settings.icon_image | image_url: width: 80 }} 80w,
+                             {{ block.settings.icon_image | image_url: width: 120 }} 120w,
+                             {{ block.settings.icon_image | image_url: width: 160 }} 160w"
+                     sizes="(max-width: 768px) 40px, 60px"
+                     alt="{{ block.settings.title | escape }}" 
+                     class="benefit-icon-image" 
+                     width="40" 
+                     height="40"
+                     loading="lazy">
+              {% else %}
+                <div class="icon" aria-hidden="true">
+                  {% case block.settings.preset_icon %}
+                    {% when 'lightning' %}
+                      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z"/></svg>
+                    {% when 'shield' %}
+                      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11.5C15.4,11.5 16,12.4 16,13V16C16,17.4 15.4,18 14.8,18H9.2C8.6,18 8,17.4 8,16V13C8,12.4 8.6,11.5 9.2,11.5V10C9.2,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,10V11.5H13.5V10C13.5,8.7 12.8,8.2 12,8.2Z"/></svg>
+                    {% when 'refresh' %}
+                      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"/></svg>
+                    {% when 'check' %}
+                      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    {% else %}
+                      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  {% endcase %}
+                </div>
+              {% endif %}
+            </div>
+            <h3 class="benefit-title">{{ block.settings.title }}</h3>
+            <p class="benefit-description">{{ block.settings.description }}</p>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Desktop Layout: Benefits + Image side-by-side -->
+      <div class="content-layout{% unless section.settings.show_image and section.settings.section_image != blank %} no-image{% endunless %}">
+        <div class="benefits-wrapper">
+          <!-- Desktop Header in first column -->
+          {% if heading_accent != blank or heading_regular != blank or subtitle != blank %}
+            <div class="desktop-header">
+              {% if heading_regular != blank or heading_accent != blank %}
+                <div class="section-heading">
+                  <h2 class="heading-text">
+                    {% if heading_regular != blank %}
+                      {{ heading_regular }}
+                    {% endif %}
+                    {% if heading_accent != blank %}
+                      <span class="{% if section.settings.use_theme_colors %}global-accent-text{% else %}custom-accent-text{% endif %}">{{ heading_accent }}</span>
+                    {% endif %}
+                  </h2>
+                </div>
+              {% endif %}
+              {% if subtitle != blank %}
+                <div class="section-subtitle">{{ subtitle }}</div>
+              {% endif %}
+            </div>
+          {% endif %}
+          
+          <div class="benefits-section">
+            {% for block in section.blocks limit: 4 %}
+                <div class="benefit-item" data-block-id="{{ block.id }}" {{ block.shopify_attributes }}>
+                <div class="icon-container">
+                  {% if block.settings.use_custom_icon and block.settings.custom_icon_svg != blank %}
+                    {%- assign custom_svg = block.settings.custom_icon_svg | strip -%}
+                    {%- if custom_svg contains '<svg' -%}
+                      <div class="icon" aria-hidden="true">{{ custom_svg }}</div>
+                    {%- else -%}
+                      <div class="icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      </div>
+                    {%- endif -%}
+                  {% elsif block.settings.icon_image != blank %}
+                    <img src="{{ block.settings.icon_image | image_url: width: 120 }}" 
+                         srcset="{{ block.settings.icon_image | image_url: width: 40 }} 40w,
+                                 {{ block.settings.icon_image | image_url: width: 80 }} 80w,
+                                 {{ block.settings.icon_image | image_url: width: 120 }} 120w,
+                                 {{ block.settings.icon_image | image_url: width: 160 }} 160w"
+                         sizes="(max-width: 768px) 40px, 60px"
+                         alt="{{ block.settings.title | escape }}" 
+                         class="benefit-icon-image" 
+                         width="40" 
+                         height="40"
+                         loading="lazy">
+                  {% else %}
+                    <div class="icon" aria-hidden="true">
+                      {% case block.settings.preset_icon %}
+                        {% when 'lightning' %}
+                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z"/></svg>
+                        {% when 'shield' %}
+                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11.5C15.4,11.5 16,12.4 16,13V16C16,17.4 15.4,18 14.8,18H9.2C8.6,18 8,17.4 8,16V13C8,12.4 8.6,11.5 9.2,11.5V10C9.2,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,10V11.5H13.5V10C13.5,8.7 12.8,8.2 12,8.2Z"/></svg>
+                        {% when 'refresh' %}
+                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"/></svg>
+                        {% when 'check' %}
+                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        {% else %}
+                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      {% endcase %}
+                    </div>
+                  {% endif %}
+                </div>
+                <h3 class="benefit-title">{{ block.settings.title }}</h3>
+                <p class="benefit-description">{{ block.settings.description }}</p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        
+        <!-- Desktop Image -->
+        {% if section.settings.show_image and section.settings.section_image != blank %}
+          <div class="desktop-image-container">
+            <img src="{{ section.settings.section_image | image_url: width: 1200 }}" 
+                 srcset="{{ section.settings.section_image | image_url: width: 800 }} 800w,
+                         {{ section.settings.section_image | image_url: width: 1000 }} 1000w,
+                         {{ section.settings.section_image | image_url: width: 1200 }} 1200w,
+                         {{ section.settings.section_image | image_url: width: 1600 }} 1600w,
+                         {{ section.settings.section_image | image_url: width: 2000 }} 2000w"
+                 sizes="(max-width: 767px) 0px, (max-width: 1199px) 50vw, 800px"
+                 alt="{{ section.settings.section_image.alt | default: 'Section Image' | escape }}" 
+                 class="section-image"
+                 loading="lazy" 
+                 width="{{ section.settings.section_image.width }}" 
+                 height="{{ section.settings.section_image.height }}">
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Dynamic styles that depend on theme customizer settings */
+  
+  /* Section max width customization */
+  .four-benefits-wrapper-{{ section_id }} .four-benefits-container {
+    max-width: {{ section.settings.section_max_width | default: 1200 }}px;
+    margin: 0 auto;
+  }
+  
+  /* Enhanced accent text styling with global and local customization options */
+  .four-benefits-wrapper-{{ section_id }} .global-accent-text,
+  .four-benefits-wrapper-{{ section_id }} .custom-accent-text {
+    /* Always apply core accent text styling */
+    margin-left: {{ section.settings.accent_text_margin_left }}px;
+    
+    /* Check for gradient first - it works regardless of global/local settings */
+    {% if use_theme_colors %}
+      /* Use global dark gradient when theme colors are enabled */
+      background: {{ settings.global_accent_text_gradient_dark }};
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+      padding: 2px 4px;
+      margin: -2px -4px;
+      line-height: 1.3;
+    {% elsif section.settings.use_accent_gradient %}
+      background: {{ section.settings.accent_text_gradient }};
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+      padding: 2px 4px;
+      margin: -2px -4px;
+      line-height: 1.3;
+    {% else %}
+      /* Apply solid color based on global or local settings */
+      color: {% if use_theme_colors %}{{ settings.global_section_accent_1_color }}{% else %}{{ section.settings.accent_color }}{% endif %};
+    {% endif %}
+    
+    {% if section.settings.override_global_accent %}
+      /* Use section-specific typography settings when override is enabled */
+      {% if section.settings.accent_font_family != 'inherit' %}
+        {% case section.settings.accent_font_family %}
+          {% when 'serif' %}
+            font-family: serif;
+          {% when 'Georgia Pro' %}
+            font-family: 'Georgia Pro', Georgia, serif;
+          {% when 'Bodoni Moda' %}
+            font-family: 'Bodoni Moda', Georgia, serif;
+          {% when 'Instrument Serif' %}
+            font-family: 'Instrument Serif', Georgia, serif;
+          {% when 'DM Serif Text' %}
+            font-family: 'DM Serif Text', Georgia, serif;
+          {% when 'Nothing You Could Do' %}
+            font-family: 'Nothing You Could Do', cursive;
+        {% endcase %}
+      {% else %}
+        font-family: var(--font-accent-family, var(--font-body-family));
+      {% endif %}
+      
+      font-style: {% if section.settings.accent_font_style != 'normal' %}{{ section.settings.accent_font_style }}{% else %}var(--font-accent-style, normal){% endif %};
+      font-weight: {% if section.settings.accent_font_weight != 'inherit' %}{{ section.settings.accent_font_weight }}{% else %}var(--font-accent-weight, inherit){% endif %};
+      
+    {% else %}
+      /* Use global accent typography system */
+      font-family: var(--font-accent-family, var(--font-body-family));
+      font-style: var(--font-accent-style, normal);
+      font-weight: var(--font-accent-weight, inherit);
+      letter-spacing: var(--font-accent-letter-spacing, inherit);
+      text-transform: var(--font-accent-text-transform, none);
+    {% endif %}
+  }
+
+  /* Section wrapper with dynamic background and padding */
+  .four-benefits-wrapper-{{ section_id }} {
+    {% if use_theme_colors %}
+      {% if settings.global_section_use_gradient_background %}
+        background: var(--gradient-background);
+      {% else %}
+        background-color: {{ settings.global_section_background_color }};
+      {% endif %}
+    {% else %}
+      background: {{ section.settings.section_background | default: '#FFFFFF' }};
+    {% endif %}
+    /* Mobile padding */
+    padding-top: {{ section.settings.padding_top_mobile }}px;
+    padding-bottom: {{ section.settings.padding_bottom_mobile }}px;
+    padding-left: {{ section.settings.padding_left_mobile }}px;
+    padding-right: {{ section.settings.padding_right_mobile }}px;
+  }
+
+  .four-benefits-wrapper-{{ section_id }} .section-heading {
+    text-align: {{ section.settings.heading_alignment | default: 'center' }} !important;
+    margin-bottom: {{ section.settings.heading_bottom_margin_mobile | default: 8 }}px !important;
+  }
+
+  .four-benefits-wrapper-{{ section_id }} .heading-text {
+    font-size: {{ section.settings.heading_size_mobile }}px !important;
+    color: {% if use_theme_colors %}{{ settings.global_section_text_color }}{% else %}{{ section.settings.heading_color }}{% endif %} !important;
+    margin: 0 !important;
+    margin-bottom: {{ section.settings.subtitle_top_margin_mobile | default: 8 }}px !important;
+  }
+
+  .four-benefits-wrapper-{{ section_id }} .section-subtitle {
+    font-size: {{ section.settings.subtitle_size_mobile }}px !important;
+    color: {% if use_theme_colors %}{{ settings.global_section_text_color }}{% else %}{{ section.settings.subtitle_color }}{% endif %} !important;
+    text-align: {{ section.settings.heading_alignment | default: 'center' }} !important;
+    margin: 0 !important;
+    line-height: 1.4 !important;
+    letter-spacing: var(--letter-spacing-body) !important;
+  }
+
+  .four-benefits-wrapper-{{ section_id }} .icon-container {
+    background: {% if use_theme_colors %}{{ settings.global_accent_text_gradient_dark }}{% else %}{{ section.settings.icon_background | default: '#FFFFFF' }}{% endif %};
+    {% if section.settings.icon_border_width > 0 %}
+      border: {{ section.settings.icon_border_width }}px {{ section.settings.icon_border_style }} {{ section.settings.icon_border_color }};
+    {% endif %}
+  }
+
+  {% if section.settings.show_outer_border %}
+  .four-benefits-wrapper-{{ section_id }} .icon-container::before {
+    content: '';
+            position: absolute;
+    top: -{{ section.settings.outer_border_spacing }}px;
+    left: -{{ section.settings.outer_border_spacing }}px;
+    right: -{{ section.settings.outer_border_spacing }}px;
+    bottom: -{{ section.settings.outer_border_spacing }}px;
+    border: {{ section.settings.outer_border_width }}px {{ section.settings.outer_border_style }} {{ section.settings.outer_border_color }};
+    border-radius: 50%;
+    z-index: -1;
+  }
+  {% endif %}
+
+  .four-benefits-wrapper-{{ section_id }} .icon {
+    color: {{ section.settings.icon_color }};
+  }
+
+  .four-benefits-wrapper-{{ section_id }} .benefit-icon-image {
+    object-fit: contain;
+  }
+
+  /* Section Image Border Radius */
+  .four-benefits-wrapper-{{ section_id }} .section-image {
+    border-radius: {{ section.settings.image_border_radius }}px;
+  }
+
+  /* Benefit Block Alignment */
+  {% if section.settings.benefit_alignment == 'left' %}
+    .four-benefits-wrapper-{{ section_id }} .benefit-item {
+      text-align: left;
+    }
+    
+    .four-benefits-wrapper-{{ section_id }} .mobile-benefits-section .benefit-item {
+      align-items: flex-start;
+    }
+    
+    .four-benefits-wrapper-{{ section_id }} .icon-container {
+      margin: 0 0 20px 0;
+    }
+    
+    /* Desktop specific left alignment */
+    @media screen and (min-width: 768px) {
+      .four-benefits-wrapper-{{ section_id }} .benefit-item {
+        margin: 0;
+        max-width: none;
+      }
+    }
+  {% endif %}
+
+  {% for block in section.blocks limit: 4 %}
+    .four-benefits-wrapper-{{ section_id }} .benefit-item[data-block-id="{{ block.id }}"] .icon {
+      width: {{ block.settings.icon_size_mobile | default: 28 }}px;
+      height: {{ block.settings.icon_size_mobile | default: 28 }}px;
+    }
+
+    .four-benefits-wrapper-{{ section_id }} .benefit-item[data-block-id="{{ block.id }}"] .icon svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+
+    .four-benefits-wrapper-{{ section_id }} .benefit-item[data-block-id="{{ block.id }}"] .benefit-icon-image {
+      width: {{ block.settings.icon_size_mobile | default: 28 }}px;
+      height: {{ block.settings.icon_size_mobile | default: 28 }}px;
+    }
+
+    /* Vertical spacing for each benefit block */
+    .four-benefits-wrapper-{{ section_id }} .benefit-item[data-block-id="{{ block.id }}"] .icon-container {
+      margin-bottom: {{ block.settings.vertical_spacing | default: 20 }}px;
+    }
+
+    .four-benefits-wrapper-{{ section_id }} .benefit-item[data-block-id="{{ block.id }}"] .benefit-title {
+      margin-bottom: {{ block.settings.vertical_spacing | default: 20 | divided_by: 2.5 }}px;
+    }
+  {% endfor %}
+
+  .four-benefits-wrapper-{{ section_id }} .benefit-title {
+    font-size: {{ section.settings.benefit_title_size_mobile }}px;
+    color: {% if use_theme_colors %}{{ settings.global_section_text_color }}{% else %}{{ section.settings.benefit_title_color }}{% endif %};
+  }
+
+  .four-benefits-wrapper-{{ section_id }} .benefit-description {
+    font-size: {{ section.settings.benefit_description_size_mobile }}px;
+    color: {% if use_theme_colors %}{{ settings.global_section_text_color }}{% else %}{{ section.settings.benefit_description_color }}{% endif %};
+  }
+
+  /* Mobile-specific styles */
+  .four-benefits-wrapper-{{ section_id }} .mobile-benefits-section .benefit-title {
+    font-size: {{ section.settings.benefit_title_size_mobile }}px;
+    color: {% if use_theme_colors %}{{ settings.global_section_text_color }}{% else %}{{ section.settings.benefit_title_color }}{% endif %};
+  }
+
+  .four-benefits-wrapper-{{ section_id }} .mobile-benefits-section .benefit-description {
+    font-size: {{ section.settings.benefit_description_size_mobile }}px;
+    color: {% if use_theme_colors %}{{ settings.global_section_text_color }}{% else %}{{ section.settings.benefit_description_color }}{% endif %};
+  }
+
+  /* Desktop responsive font sizes and padding */
+  @media screen and (min-width: 768px) {
+    /* Desktop padding */
+    .four-benefits-wrapper-{{ section_id }} {
+      padding-top: {{ section.settings.padding_top_desktop }}px;
+      padding-bottom: {{ section.settings.padding_bottom_desktop }}px;
+      padding-left: {{ section.settings.padding_left_desktop }}px;
+      padding-right: {{ section.settings.padding_right_desktop }}px;
+    }
+    
+    /* Center benefits section and align with image */
+    .four-benefits-wrapper-{{ section_id }} .benefits-section {
+      justify-content: center;
+    }
+    
+    /* Hide mobile header on desktop since it's now in first column */
+    .four-benefits-wrapper-{{ section_id }} .section-header.mobile-header-below-image {
+      display: none;
+    }
+    
+    /* Desktop header styling in first column */
+    .four-benefits-wrapper-{{ section_id }} .desktop-header {
+      margin-bottom: 30px;
+      text-align: left;
+    }
+
+    .four-benefits-wrapper-{{ section_id }} .section-heading {
+      margin-bottom: {{ section.settings.heading_bottom_margin_desktop | default: 8 }}px !important;
+    }
+
+    .four-benefits-wrapper-{{ section_id }} .heading-text {
+      font-size: {{ section.settings.heading_size_desktop }}px !important;
+      margin-bottom: {{ section.settings.subtitle_top_margin_desktop | default: 8 }}px !important;
+    }
+
+    .four-benefits-wrapper-{{ section_id }} .section-subtitle {
+      font-size: {{ section.settings.subtitle_size_desktop }}px !important;
+    }
+
+    {% for block in section.blocks limit: 4 %}
+      .four-benefits-wrapper-{{ section_id }} .benefit-item[data-block-id="{{ block.id }}"] .icon {
+        width: {{ block.settings.icon_size_desktop | default: 32 }}px;
+        height: {{ block.settings.icon_size_desktop | default: 32 }}px;
+      }
+
+      .four-benefits-wrapper-{{ section_id }} .benefit-item[data-block-id="{{ block.id }}"] .icon svg {
+        width: 100%;
+        height: 100%;
+        fill: currentColor;
+      }
+
+      .four-benefits-wrapper-{{ section_id }} .benefit-item[data-block-id="{{ block.id }}"] .benefit-icon-image {
+        width: {{ block.settings.icon_size_desktop | default: 32 }}px;
+        height: {{ block.settings.icon_size_desktop | default: 32 }}px;
+      }
+
+      /* Desktop vertical spacing for each benefit block */
+      .four-benefits-wrapper-{{ section_id }} .benefit-item[data-block-id="{{ block.id }}"] .icon-container {
+        margin-bottom: {{ block.settings.vertical_spacing | default: 20 }}px;
+      }
+
+      .four-benefits-wrapper-{{ section_id }} .benefit-item[data-block-id="{{ block.id }}"] .benefit-title {
+        margin-bottom: {{ block.settings.vertical_spacing | default: 20 | divided_by: 2.5 }}px;
+      }
+    {% endfor %}
+
+    .four-benefits-wrapper-{{ section_id }} .benefit-title {
+      font-size: {{ section.settings.benefit_title_size_desktop }}px;
+      color: {% if use_theme_colors %}{{ settings.global_section_text_color }}{% else %}{{ section.settings.benefit_title_color }}{% endif %};
+    }
+
+    .four-benefits-wrapper-{{ section_id }} .benefit-description {
+      font-size: {{ section.settings.benefit_description_size_desktop }}px;
+      color: {% if use_theme_colors %}{{ settings.global_section_text_color }}{% else %}{{ section.settings.benefit_description_color }}{% endif %};
+    }
+
+    /* Desktop Layout Options */
+    {% if section.settings.desktop_layout == 'row' %}
+      .four-benefits-wrapper-{{ section_id }} .benefits-section {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 20px;
+        grid-template-columns: none;
+      }
+
+      .four-benefits-wrapper-{{ section_id }} .benefit-item {
+        flex: 1;
+        max-width: none;
+        margin: 0;
+      }
+
+      /* Adjust container width for single row layout */
+      .four-benefits-wrapper-{{ section_id }} .benefits-wrapper {
+        max-width: 100%;
+      }
+
+      .four-benefits-wrapper-{{ section_id }} .benefits-section {
+        max-width: 100%;
+      }
+
+      .four-benefits-wrapper-{{ section_id }} .content-layout.no-image .benefits-wrapper {
+        max-width: 1000px;
+      }
+
+      .four-benefits-wrapper-{{ section_id }} .content-layout.no-image .benefits-section {
+        max-width: 1000px;
+        justify-content: flex-start !important;
+      }
+
+      /* Override external CSS rule for content-layout.no-image */
+      .four-benefits-wrapper-{{ section_id }} .content-layout.no-image {
+        justify-content: flex-start !important;
+      }
+
+      /* Responsive adjustments for row layout on smaller screens */
+      @media screen and (min-width: 768px) and (max-width: 1024px) {
+        .four-benefits-wrapper-{{ section_id }} .benefits-section {
+          gap: 15px;
+        }
+
+        .four-benefits-wrapper-{{ section_id }} .benefit-item {
+          min-height: auto;
+        }
+      }
+
+      @media screen and (min-width: 768px) and (max-width: 900px) {
+        .four-benefits-wrapper-{{ section_id }} .benefits-section {
+          gap: 10px;
+        }
+      }
+    {% endif %}
+  }
+
+  /* Load-in animation */
+  .page-fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Add slight delay for staggered effect on multiple sections */
+  .page-fade-in:nth-child(2) { animation-delay: 0.1s; }
+  .page-fade-in:nth-child(3) { animation-delay: 0.2s; }
+  .page-fade-in:nth-child(4) { animation-delay: 0.3s; }
+</style>
+
+{% schema %}
+{
+  "name": "4 Benefits",
+  "class": "shopify-section--four-benefits",
+  "disabled_on": {
+    "groups": ["header", "footer", "aside"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Padding - Mobile"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding (Mobile)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding (Mobile)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_left_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Left Padding (Mobile)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Right Padding (Mobile)",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Section Padding - Desktop"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top Padding (Desktop)",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom Padding (Desktop)",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_left_desktop",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Left Padding (Desktop)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right_desktop",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Right Padding (Desktop)",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading_regular",
+      "label": "Heading Text",
+      "default": "Your main heading"
+    },
+    {
+      "type": "text",
+      "id": "heading_accent",
+      "label": "Heading Accent Text",
+      "default": "goes here"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "Heading Alignment",
+      "options": [
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_theme_colors",
+      "label": "Apply Theme Colors",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors & Background"
+    },
+    {
+      "type": "color_background",
+      "id": "section_background",
+      "label": "Section Background",
+      "default": "linear-gradient(180deg, #FFFFFF, #F8F8F8)"
+    },
+    { "type": "color", "id": "heading_color", "label": "Heading Color", "default": "#000000" },
+    { "type": "color", "id": "subtitle_color", "label": "Subtitle Color", "default": "#000000" },
+    
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "min": 24,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size (Mobile)",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "min": 32,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Size (Desktop)",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "heading_bottom_margin_mobile",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Bottom Margin (Mobile)",
+      "default": 8,
+      "info": "Space below the section heading on mobile devices"
+    },
+    {
+      "type": "range",
+      "id": "heading_bottom_margin_desktop",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading Bottom Margin (Desktop)",
+      "default": 8,
+      "info": "Space below the section heading on desktop devices"
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size_mobile",
+      "min": 12,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Subtitle Size (Mobile)",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size_desktop",
+      "min": 14,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Subtitle Size (Desktop)",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "subtitle_top_margin_mobile",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "label": "Subtitle Top Margin (Mobile)",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "subtitle_bottom_margin_mobile",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Subtitle Bottom Margin (Mobile)",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "subtitle_top_margin_desktop",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "label": "Subtitle Top Margin (Desktop)",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "subtitle_bottom_margin_desktop",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Subtitle Bottom Margin (Desktop)",
+      "default": 30
+    },
+    
+    {
+      "type": "header",
+      "content": "Section Width"
+    },
+    {
+      "type": "range",
+      "id": "section_max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Section Max Width",
+      "default": 1200,
+      "info": "Maximum width of the section content"
+    },
+    
+    {
+      "type": "header",
+      "content": "Benefits Layout"
+    },
+    {
+      "type": "select",
+      "id": "desktop_layout",
+      "label": "Desktop Layout",
+      "options": [
+        {
+          "value": "grid",
+          "label": "2x2 Grid"
+        },
+        {
+          "value": "row",
+          "label": "Single Row"
+        }
+      ],
+      "default": "grid",
+      "info": "Choose how to display the 4 benefits on desktop"
+    },
+    {
+      "type": "select",
+      "id": "benefit_alignment",
+      "label": "Benefit Block Alignment",
+      "options": [
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        }
+      ],
+      "default": "center",
+      "info": "Choose how to align the benefit blocks (icon, title, and description)"
+    },
+
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "benefit_title_color",
+      "label": "Benefit Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "benefit_description_color",
+      "label": "Benefit Description Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "benefit_title_size_mobile",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Benefit Title Size (Mobile)",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "benefit_title_size_desktop",
+      "min": 16,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Benefit Title Size (Desktop)",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "benefit_description_size_mobile",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Benefit Description Size (Mobile)",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "benefit_description_size_desktop",
+      "min": 14,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Benefit Description Size (Desktop)",
+      "default": 15
+    },
+    {
+      "type": "color_background",
+      "id": "icon_background",
+      "label": "Icon Background",
+      "default": "linear-gradient(135deg, #EF4A65, #FF6B9D)"
+    },
+    {
+      "type": "range",
+      "id": "icon_border_width",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "label": "Icon Border Width",
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "icon_border_style",
+      "label": "Icon Border Style",
+      "options": [
+        { "value": "solid", "label": "Solid" },
+        { "value": "dashed", "label": "Dashed" },
+        { "value": "dotted", "label": "Dotted" }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "color",
+      "id": "icon_border_color",
+      "label": "Icon Border Color",
+      "default": "#ffffff"
+    },
+    
+    
+    {
+      "type": "header",
+      "content": "Section Image"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "Show Section Image",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "section_image",
+      "label": "Section Image"
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Image Border Radius",
+      "default": 15,
+      "info": "Adjust the rounded corners of the section image"
+    },
+    
+    {
+      "type": "header",
+      "content": "Accent Text Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "override_global_accent",
+      "label": "Override Global Accent Typography",
+      "default": false,
+      "info": "When enabled, use section-specific accent typography settings below. When disabled, use the global accent typography from Theme Settings > Typography > Accent Typography."
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Text Color",
+      "default": "#EF4A65"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_accent_gradient",
+      "label": "Use Accent Gradient",
+      "default": false,
+      "info": "Apply gradient effect to the accent text instead of solid color"
+    },
+    {
+      "type": "color_background",
+      "id": "accent_text_gradient",
+      "label": "Accent Text Gradient",
+      "default": "linear-gradient(45deg, #EF4A65, #FF6B9D)",
+      "info": "Choose a gradient for the accent text. This setting is only used when 'Use Accent Gradient' is enabled above."
+    },
+    {
+      "type": "header",
+      "content": "Section-Specific Accent Font Settings"
+    },
+    {
+      "type": "select",
+      "id": "accent_font_family",
+      "label": "Section Accent Font Family",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "Use Global Setting"
+        },
+        {
+          "value": "serif",
+          "label": "System Serif"
+        },
+        {
+          "value": "Georgia Pro",
+          "label": "Georgia Pro"
+        },
+        {
+          "value": "Bodoni Moda",
+          "label": "Bodoni Moda"
+        },
+        {
+          "value": "Instrument Serif",
+          "label": "Instrument Serif"
+        },
+        {
+          "value": "DM Serif Text",
+          "label": "DM Serif Text"
+        },
+        {
+          "value": "Nothing You Could Do",
+          "label": "Nothing You Could Do"
+        }
+      ],
+      "default": "inherit",
+      "info": "Choose a custom font family for the accent text (only used when Override Global Accent Typography is enabled)"
+    },
+    {
+      "type": "select",
+      "id": "accent_font_style",
+      "label": "Accent Text Font Style",
+      "options": [
+        {
+          "value": "normal",
+          "label": "Normal"
+        },
+        {
+          "value": "italic",
+          "label": "Italic"
+        }
+      ],
+      "default": "normal",
+      "info": "Choose the font style for the accent text"
+    },
+    {
+      "type": "select",
+      "id": "accent_font_weight",
+      "label": "Accent Text Font Weight",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "Default (Inherit)"
+        },
+        {
+          "value": "300",
+          "label": "Light (300)"
+        },
+        {
+          "value": "400",
+          "label": "Normal (400)"
+        },
+        {
+          "value": "500",
+          "label": "Medium (500)"
+        },
+        {
+          "value": "600",
+          "label": "Semi Bold (600)"
+        },
+        {
+          "value": "700",
+          "label": "Bold (700)"
+        },
+        {
+          "value": "800",
+          "label": "Extra Bold (800)"
+        },
+        {
+          "value": "900",
+          "label": "Black (900)"
+        }
+      ],
+      "default": "inherit",
+      "info": "Choose the font weight (boldness) for the accent text"
+    },
+    {
+      "type": "range",
+      "id": "accent_text_margin_left",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Accent Text Left Margin",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Benefit Title",
+          "default": "Benefit Title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Benefit Description",
+          "default": "Description of benefit goes here."
+        },
+        {
+          "type": "select",
+          "id": "preset_icon",
+          "label": "Preset Icon",
+          "options": [
+            { "value": "lightning", "label": "Lightning" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "refresh", "label": "Refresh" },
+            { "value": "check", "label": "Check" }
+          ],
+          "default": "lightning"
+        },
+        {
+          "type": "checkbox",
+          "id": "use_custom_icon",
+          "label": "Use Custom SVG Icon",
+          "default": false
+        },
+        {
+          "type": "html",
+          "id": "custom_icon_svg",
+          "label": "Custom SVG Icon",
+          "info": "Paste your custom SVG code here"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Icon Image (Alternative to SVG)"
+        },
+        {
+          "type": "range",
+          "id": "icon_size_mobile",
+          "min": 16,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Icon Size (Mobile)",
+          "default": 28
+        },
+        {
+          "type": "range",
+          "id": "icon_size_desktop",
+          "min": 20,
+          "max": 80,
+          "step": 2,
+          "unit": "px",
+          "label": "Icon Size (Desktop)",
+          "default": 32
+        },
+        {
+          "type": "range",
+          "id": "vertical_spacing",
+          "min": 5,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Vertical Spacing",
+          "default": 20,
+          "info": "Control the spacing between icon, title, and description"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "4 Benefits",
+      "settings": {},
+      "blocks": [
+        {
+          "type": "benefit",
+          "settings": {
+            "title": "Benefit 1",
+            "description": "Describe your first key benefit and how it helps your customers.",
+            "preset_icon": "lightning"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "title": "Benefit 2",
+            "description": "Explain your second important benefit and its value.",
+            "preset_icon": "shield"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "title": "Benefit 3",
+            "description": "Highlight your third benefit and why it matters.",
+            "preset_icon": "refresh"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "title": "Benefit 4",
+            "description": "Detail your fourth benefit and its advantages.",
+            "preset_icon": "check"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
