@@ -1,0 +1,387 @@
+{%- comment -%}
+  Quantity Bundle Block
+  Similar styling to variant bundle but for quantity selection
+  Parameters from block settings:
+  - All color and styling parameters
+  - quantity_options: Array of quantities to display
+  - pricing_options: Pricing for each quantity
+{%- endcomment -%}
+
+{%- liquid
+  assign current_product = product | default: product
+  assign unique_id = block.id | default: 'default'
+-%}
+
+<div
+  class="quantity-bundle-selector"
+  style="
+    {% if block.settings.card_background %}--card-background: {{ block.settings.card_background }};{% endif %}
+    --card-padding: {{ block.settings.card_padding | default: 12 }}px;
+    --card-border-width: {{ block.settings.card_border_width | default: 2 }}px;
+    --selected-card-border-width: {{ block.settings.selected_card_border_width | default: 2 }}px;
+    {% if block.settings.card_border_color %}--card-border-color: {{ block.settings.card_border_color }};{% endif %}
+    {% if block.settings.card_hover_border_color %}--card-hover-border-color: {{ block.settings.card_hover_border_color }};{% endif %}
+    {% if block.settings.selected_card_border_color %}--card-selected-border-color: {{ block.settings.selected_card_border_color }};{% endif %}
+    {% if block.settings.selected_card_background %}--card-selected-bg-color: {{ block.settings.selected_card_background }};{% endif %}
+    {% if block.settings.badge_background_color %}--badge-bg-color: {{ block.settings.badge_background_color }};{% endif %}
+    {% if block.settings.badge_text_color %}--badge-text-color: {{ block.settings.badge_text_color }};{% endif %}
+    {% if block.settings.title_color %}--title-color: {{ block.settings.title_color }};{% endif %}
+    --title-font-size: {{ block.settings.title_font_size | default: 14 }}px;
+    {% if block.settings.description_color %}--description-color: {{ block.settings.description_color }};{% endif %}
+    --description-font-size: {{ block.settings.description_font_size | default: 11 }}px;
+    {% if block.settings.current_price_color %}--current-price-color: {{ block.settings.current_price_color }};{% endif %}
+    --current-price-font-size: {{ block.settings.current_price_font_size | default: 16 }}px;
+    {% if block.settings.original_price_color %}--original-price-color: {{ block.settings.original_price_color }};{% endif %}
+    --original-price-font-size: {{ block.settings.original_price_font_size | default: 11 }}px;
+    --card-gap: {{ block.settings.card_gap | default: 8 }}px;
+    --border-radius: {{ block.settings.border_radius | default: 8 }}px;
+    margin-top: {{ block.settings.margin_top | default: 0 }}px;
+    margin-bottom: {{ block.settings.margin_bottom | default: 0 }}px;
+  "
+  {{ block.shopify_attributes }}
+>
+  <div class="quantity-bundle-container">
+    {%- liquid
+      assign quantity_1 = block.settings.quantity_1 | default: 1
+      assign quantity_2 = block.settings.quantity_2 | default: 2
+      assign quantity_3 = block.settings.quantity_3 | default: 3
+      
+      assign price_1 = block.settings.price_1 | default: current_product.price
+      assign price_2 = block.settings.price_2 | default: current_product.price
+      assign price_3 = block.settings.price_3 | default: current_product.price
+      
+      assign compare_price_1 = block.settings.compare_price_1
+      assign compare_price_2 = block.settings.compare_price_2  
+      assign compare_price_3 = block.settings.compare_price_3
+      
+      assign title_1 = block.settings.title_1 | default: 'Single'
+      assign title_2 = block.settings.title_2 | default: 'Bundle of 2'
+      assign title_3 = block.settings.title_3 | default: 'Bundle of 3'
+      
+      assign description_1 = block.settings.description_1
+      assign description_2 = block.settings.description_2
+      assign description_3 = block.settings.description_3
+      
+      assign badge_1 = block.settings.badge_1
+      assign badge_2 = block.settings.badge_2 | default: 'POPULAR'
+      assign badge_3 = block.settings.badge_3 | default: 'BEST VALUE'
+      
+      assign show_badge_1 = block.settings.show_badge_1
+      assign show_badge_2 = block.settings.show_badge_2
+      assign show_badge_3 = block.settings.show_badge_3
+      
+      assign quantities = quantity_1 | append: ',' | append: quantity_2 | append: ',' | append: quantity_3 | split: ','
+      assign prices = price_1 | append: ',' | append: price_2 | append: ',' | append: price_3 | split: ','
+      assign compare_prices = compare_price_1 | append: ',' | append: compare_price_2 | append: ',' | append: compare_price_3 | split: ','
+      assign titles = title_1 | append: '|' | append: title_2 | append: '|' | append: title_3 | split: '|'
+      assign descriptions = description_1 | append: '|' | append: description_2 | append: '|' | append: description_3 | split: '|'
+      assign badges = badge_1 | append: '|' | append: badge_2 | append: '|' | append: badge_3 | split: '|'
+      assign show_badges = show_badge_1 | append: ',' | append: show_badge_2 | append: ',' | append: show_badge_3 | split: ','
+    -%}
+
+    {% for quantity in quantities limit: 3 %}
+      {%- liquid
+        assign current_quantity = quantity | times: 1
+        assign current_price = prices[forloop.index0] | times: 1
+        assign current_compare_price = compare_prices[forloop.index0] | times: 1
+        assign current_title = titles[forloop.index0]
+        assign current_description = descriptions[forloop.index0]
+        assign current_badge = badges[forloop.index0]
+        assign current_show_badge = show_badges[forloop.index0]
+      -%}
+
+      <div
+        class="quantity-bundle-card"
+        data-quantity="{{ current_quantity }}"
+        data-price="{{ current_price }}"
+        data-compare-price="{{ current_compare_price }}"
+        data-title="{{ current_title | escape }}"
+        {% if forloop.index == 1 %}data-selected="true"{% endif %}
+      >
+        {% if current_show_badge == 'true' and current_badge != blank %}
+          <div class="quantity-bundle-badge">
+            {{ current_badge }}
+          </div>
+        {% endif %}
+
+        {% if block.settings.show_product_image and current_product.featured_media %}
+          <div class="quantity-bundle-image">
+            <div
+              class="quantity-bundle-visual"
+              style="background-image: url('{{ current_product.featured_media | image_url: width: 200 }}');">
+              {% if current_quantity > 1 %}
+                <div class="quantity-overlay">{{ current_quantity }}x</div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="quantity-bundle-content">
+          <h3 class="quantity-bundle-title">{{ current_title }}</h3>
+
+          {% if current_description != blank %}
+            <p class="quantity-bundle-description">{{ current_description }}</p>
+          {% endif %}
+
+          <div class="quantity-bundle-pricing">
+            {% if current_compare_price > 0 and current_compare_price > current_price %}
+              <span class="quantity-original-price">{{ current_compare_price | money }}</span>
+            {% endif %}
+            <span class="quantity-current-price">{{ current_price | money }}</span>
+            
+            {% if current_compare_price > 0 and current_compare_price > current_price %}
+              {%- liquid
+                assign savings = current_compare_price | minus: current_price
+                assign savings_percent = savings | times: 100 | divided_by: current_compare_price | round
+              -%}
+              <span class="quantity-savings">Save {{ savings_percent }}%</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <input 
+          type="radio" 
+          name="quantity-bundle-{{ unique_id }}" 
+          value="{{ current_quantity }}"
+          class="quantity-bundle-radio"
+          {% if forloop.index == 1 %}checked{% endif %}
+          data-price="{{ current_price }}"
+        >
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+.quantity-bundle-selector {
+  width: 100%;
+  font-family: var(--font-body-family);
+}
+
+.quantity-bundle-container {
+  display: flex;
+  gap: var(--card-gap);
+  flex-wrap: wrap;
+}
+
+/* Keep horizontal layout on all screen sizes */
+
+.quantity-bundle-card {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  max-width: calc(33.333% - var(--card-gap));
+  padding: var(--card-padding);
+  border: var(--card-border-width) solid var(--card-border-color, #e5e5e5);
+  border-radius: var(--border-radius);
+  background: var(--card-background, #ffffff);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+}
+
+.quantity-bundle-card:hover {
+  border-color: var(--card-hover-border-color, #007acc);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.quantity-bundle-card[data-selected="true"] {
+  border-color: var(--card-selected-border-color, #007acc);
+  border-width: var(--selected-card-border-width);
+  background: var(--card-selected-bg-color, #f8f9ff);
+}
+
+.quantity-bundle-badge {
+  position: absolute;
+  top: -6px;
+  right: 8px;
+  background: var(--badge-bg-color, #007acc);
+  color: var(--badge-text-color, #ffffff);
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 2;
+}
+
+.quantity-bundle-image {
+  width: 100%;
+  height: 80px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.quantity-bundle-visual {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.quantity-overlay {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.quantity-bundle-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quantity-bundle-title {
+  font-size: var(--title-font-size);
+  color: var(--title-color, #333333);
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.quantity-bundle-description {
+  font-size: var(--description-font-size);
+  color: var(--description-color, #666666);
+  margin: 0;
+  line-height: 1.3;
+  opacity: 0.8;
+}
+
+.quantity-bundle-pricing {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: auto;
+}
+
+.quantity-current-price {
+  font-size: var(--current-price-font-size);
+  color: var(--current-price-color, #333333);
+  font-weight: 700;
+}
+
+.quantity-original-price {
+  font-size: var(--original-price-font-size);
+  color: var(--original-price-color, #999999);
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.quantity-savings {
+  font-size: 10px;
+  color: #10b981;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.quantity-bundle-radio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Always maintain vertical layout */
+.quantity-bundle-card {
+  flex-direction: column;
+  text-align: center;
+}
+
+.quantity-bundle-image {
+  align-self: center;
+}
+
+.quantity-bundle-content {
+  text-align: center;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .quantity-bundle-container {
+    gap: calc(var(--card-gap) / 2);
+  }
+  
+  .quantity-bundle-card {
+    padding: calc(var(--card-padding) * 0.8);
+    min-height: 160px;
+    max-width: calc(33.333% - calc(var(--card-gap) / 2));
+  }
+  
+  .quantity-bundle-image {
+    height: 50px;
+    margin-bottom: 8px;
+  }
+  
+  .quantity-bundle-title {
+    font-size: calc(var(--title-font-size) * 0.9);
+  }
+  
+  .quantity-current-price {
+    font-size: calc(var(--current-price-font-size) * 0.9);
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .quantity-bundle-card {
+    max-width: calc(50% - calc(var(--card-gap) / 2));
+    min-height: 140px;
+  }
+  
+  .quantity-bundle-image {
+    height: 40px;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const quantityCards = document.querySelectorAll('.quantity-bundle-card');
+  const quantityInput = document.querySelector('input[name="quantity"]');
+  
+  quantityCards.forEach(card => {
+    card.addEventListener('click', function() {
+      // Remove selected state from all cards
+      quantityCards.forEach(c => {
+        c.setAttribute('data-selected', 'false');
+        c.querySelector('.quantity-bundle-radio').checked = false;
+      });
+      
+      // Add selected state to clicked card
+      this.setAttribute('data-selected', 'true');
+      this.querySelector('.quantity-bundle-radio').checked = true;
+      
+      // Update quantity input
+      const quantity = this.getAttribute('data-quantity');
+      if (quantityInput) {
+        quantityInput.value = quantity;
+        
+        // Trigger change event
+        const event = new Event('change', { bubbles: true });
+        quantityInput.dispatchEvent(event);
+      }
+      
+      // Update price if needed
+      const price = this.getAttribute('data-price');
+      const priceElements = document.querySelectorAll('.price');
+      priceElements.forEach(priceEl => {
+        // Update price display logic here if needed
+      });
+    });
+  });
+});
+</script>

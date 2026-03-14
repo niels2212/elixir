@@ -1,0 +1,115 @@
+      
+<style>
+    {% if settings.enable_global_button_styling %}
+      /* 3D Bottom Border Effect - Only when global button styling is enabled */
+      .button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .btn:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      button[type="submit"]:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      input[type="submit"]:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .product-form__submit:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .shop-add-to-cart-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .cart__checkout-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .contact-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .contact__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .button--primary:not(.cart-remove-button):not(.disable-global-button-styling),
+      .claim-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .shopify-payment-button .shopify-payment-button__button--unbranded:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .shopify-payment-button__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .newsletter-form__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .field__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .theme-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .guarantee-section__cta:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .custom-hero__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling) {
+        border-bottom: calc(var(--global-button-border-width, 0px) + var(--global-button-bottom-border-width, 0px)) solid var(--global-button-bottom-border-color) !important;
+      }
+  
+      /* 3D Button Press Effect */
+      .button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .btn:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      button[type="submit"]:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      input[type="submit"]:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .product-form__submit:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .shop-add-to-cart-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .cart__checkout-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .contact-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .contact__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .button--primary:not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .claim-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .shopify-payment-button .shopify-payment-button__button--unbranded:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .shopify-payment-button__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .newsletter-form__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .field__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .theme-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .guarantee-section__cta:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .custom-hero__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active {
+        transform: translateY(calc(var(--global-button-bottom-border-width, 0px) / 2));
+        border-bottom-width: calc((var(--global-button-border-width, 0px) + var(--global-button-bottom-border-width, 0px)) / 2) !important;
+      }
+  
+    {% else %}
+      /* Basic styles when global styling is disabled */
+      .button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .btn:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      button[type="submit"]:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      input[type="submit"]:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .product-form__submit:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .shop-add-to-cart-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .cart__checkout-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .contact-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .contact__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .button--primary:not(.cart-remove-button):not(.disable-global-button-styling),
+      .claim-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .shopify-payment-button .shopify-payment-button__button--unbranded:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .shopify-payment-button__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .newsletter-form__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .field__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .theme-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .guarantee-section__cta:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling),
+      .custom-hero__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling) {
+        padding: var(--global-button-padding-y, 12px) 20px !important;
+        letter-spacing: var(--global-button-letter-spacing, 1px) !important;
+        font-family: var(--button-font-family) !important;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-shadow: none !important;
+        outline: none;
+        font-size: var(--global-button-font-size, 14px) !important;
+        font-weight: var(--conditional-button-font-weight, var(--global-button-font-weight, 700)) !important;
+        text-transform: var(--global-button-text-transform, none) !important;
+        border-radius: var(--global-button-radius, 8px) !important;
+        border: var(--global-button-border-width, 0px) solid var(--global-button-border-color) !important;
+        border-bottom: calc(var(--global-button-border-width, 0px) + var(--global-button-bottom-border-width, 0px)) solid var(--global-button-bottom-border-color) !important;
+        position: relative;
+        overflow: hidden;
+      }
+  
+      /* Press Effect */
+      .button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .btn:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      button[type="submit"]:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      input[type="submit"]:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .product-form__submit:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .shop-add-to-cart-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .cart__checkout-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .contact-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .contact__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .button--primary:not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .claim-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .shopify-payment-button .shopify-payment-button__button--unbranded:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .shopify-payment-button__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .newsletter-form__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .field__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .theme-button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .guarantee-section__cta:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active,
+      .custom-hero__button:not(.button--tertiary):not(.cart-remove-button):not(.disable-global-button-styling):active {
+        transform: translateY(calc(var(--global-button-bottom-border-width, 0px) / 2));
+        border-bottom-width: calc((var(--global-button-border-width, 0px) + var(--global-button-bottom-border-width, 0px)) / 2) !important;
+      }
+    {% endif %}
+</style>
+  

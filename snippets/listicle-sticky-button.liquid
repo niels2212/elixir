@@ -1,0 +1,220 @@
+{% comment %}
+  Listicle Sticky Button Component
+  - Shows a sticky button that redirects to a URL instead of adding to cart
+  - Specifically designed for listicle sections
+  - Completely separate from the regular sticky-add-to-cart functionality
+{% endcomment %}
+
+{% assign button_text = block.settings.button_text | default: "YES, GET 60% OFF" %}
+{% assign button_link = block.settings.button_link | default: "#" %}
+{% assign button_bg_color = block.settings.button_bg_color | default: "#25282A" %}
+{% assign button_text_color = block.settings.button_text_color | default: "#FFFFFF" %}
+{% assign button_border_radius = block.settings.button_border_radius | default: 8 %}
+{% assign button_padding_vertical = block.settings.button_padding_vertical | default: 16 %}
+{% assign button_padding_horizontal = block.settings.button_padding_horizontal | default: 24 %}
+{% assign mobile_button_padding_vertical = block.settings.mobile_button_padding_vertical | default: 14 %}
+{% assign mobile_button_padding_horizontal = block.settings.mobile_button_padding_horizontal | default: 20 %}
+{% assign button_width_desktop = block.settings.button_width_desktop | default: 400 %}
+{% assign z_index = block.settings.z_index | default: 9900 %}
+
+<!-- Listicle Sticky Button Main Container -->
+<div id="listicleSticky-{{ block.id }}" data-listicle-sticky-button class="listicle-sticky-button">
+  <div class="listicle-sticky-button__container">
+    <div class="listicle-sticky-button__content">
+      <a href="{{ button_link }}" class="listicle-sticky-button__link" id="listicleSticky-{{ block.id }}-btn">
+        {{ button_text }}
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  #listicleSticky-{{ block.id }} {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    max-width: 100%;
+    z-index: {{ z_index }};
+    opacity: 0;
+    transform: translateY(100%);
+    transition: transform 0.4s ease, opacity 0.3s ease;
+    padding: 12px 0;
+    pointer-events: none;
+    display: none;
+    box-sizing: border-box;
+    background: transparent;
+  }
+
+  #listicleSticky-{{ block.id }}.show {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
+    display: block !important;
+  }
+
+  .listicle-sticky-button__container {
+    display: flex;
+    flex-direction: column;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 15px;
+    box-sizing: border-box;
+  }
+
+  .listicle-sticky-button__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .listicle-sticky-button__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: {{ button_width_desktop }}px;
+    padding: {{ button_padding_vertical }}px {{ button_padding_horizontal }}px;
+    background-color: {{ button_bg_color }};
+    color: {{ button_text_color }};
+    border-radius: {{ button_border_radius }}px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .listicle-sticky-button__link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background-color: {{ button_bg_color | color_darken: 10 }};
+  }
+
+  .listicle-sticky-button__link:active {
+    transform: translateY(0);
+  }
+
+  /* Shine effect */
+  .listicle-sticky-button__link:after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -100%;
+    width: 50%;
+    height: 200%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+    transform: rotate(25deg);
+    pointer-events: none;
+    animation: listicle-shine 6s infinite;
+    animation-delay: 2s;
+  }
+
+  @keyframes listicle-shine {
+    0% {
+      left: -100%;
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.8;
+    }
+    20% {
+      opacity: 0.9;
+    }
+    40% {
+      opacity: 0.8;
+    }
+    100% {
+      left: 200%;
+      opacity: 0;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .listicle-sticky-button__content {
+      justify-content: center;
+      align-items: center;
+    }
+
+    .listicle-sticky-button__link {
+      max-width: {{ button_width_desktop }}px;
+      flex-shrink: 0;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .listicle-sticky-button__container {
+      padding: 0 20px;
+    }
+    
+    .listicle-sticky-button__link {
+      font-size: 14px;
+      padding: {{ mobile_button_padding_vertical }}px {{ mobile_button_padding_horizontal }}px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .listicle-sticky-button__container {
+      padding: 0 25px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .listicle-sticky-button__container {
+      padding: 0 30px;
+    }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const listicleSticky = document.getElementById('listicleSticky-{{ block.id }}');
+  if (!listicleSticky) return;
+
+  let isVisible = false;
+  let ticking = false;
+
+  function showStickyButton() {
+    if (!isVisible) {
+      listicleSticky.classList.add('show');
+      isVisible = true;
+    }
+  }
+
+  function hideStickyButton() {
+    if (isVisible) {
+      listicleSticky.classList.remove('show');
+      isVisible = false;
+    }
+  }
+
+  function handleScroll() {
+    if (!ticking) {
+      requestAnimationFrame(function() {
+        // Show sticky button when user scrolls down 200px from top
+        if (window.scrollY > 200) {
+          showStickyButton();
+        } else {
+          hideStickyButton();
+        }
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }
+
+  // Add scroll event listener
+  window.addEventListener('scroll', handleScroll, { passive: true });
+
+  // Initial check
+  handleScroll();
+});
+</script>

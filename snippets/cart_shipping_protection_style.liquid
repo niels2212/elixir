@@ -1,0 +1,32 @@
+<style>
+  #CartDrawer {
+    {% if section.settings.use_theme_colors_cart_drawer %}
+      --cart-drawer-shipping-protection-background: transparent;
+      /* No background when theme colors are on */
+      --cart-drawer-shipping-protection-border-color: {{ settings.global_section_text_color | color_modify: 'alpha', 0.3 | default: '#A3A3A3' }};
+      --cart-drawer-shipping-protection-text-color: {{ settings.global_section_text_color | default: '#121212' }};
+    {% else %}
+      --cart-drawer-shipping-protection-background: {{ block.settings.cart_drawer_shipping_protection_bg | default: '#F1F1F1' }};
+      --cart-drawer-shipping-protection-border-color: {{ block.settings.cart_drawer_shipping_protection_border | default: '#A3A3A3' }};
+      --cart-drawer-shipping-protection-text-color: {{ block.settings.cart_drawer_shipping_protection_text | default: '#121212' }};
+      --cart-drawer-shipping-protection-border-size: {{ block.settings.cart_drawer_shipping_protection_border_size |  default: 0 | append: 'px' }}
+    {% endif %}
+
+  }
+
+
+  .cart-drawer .gb-shipping-protection {
+    background-color: var(--cart-drawer-shipping-protection-background);
+    border: var(--cart-drawer-shipping-protection-border-size) solid var(--cart-drawer-shipping-protection-border-color);
+  }
+
+  .cart-drawer .gb-shipping-protection-icontext h2,
+  .cart-drawer .gb-shipping-protection-icontext p {
+    color: var(--cart-drawer-shipping-protection-text-color) !important;
+  }
+
+  .cart-drawer .gb-shipping-protection,
+  .cart-drawer .gb-shipping-protection * {
+    color: var(--cart-drawer-shipping-protection-text-color) !important;
+  }
+</style>

@@ -1,0 +1,30 @@
+<style>
+  #CartDrawer {
+  {% if section.settings.use_theme_colors_cart_drawer %}
+    --cart-drawer-progress-active-color: {{ settings.global_section_accent_1_color | default: '#000000' }};
+    --cart-drawer-progress-inactive-color: #F2F2F2; /* Light gray at full opacity */
+    --cart-drawer-progress-active-icon-fill-color: {{ settings.global_section_button_text_color | default: '#FFFFFF' }}; /* Contrasting color for active icon */
+  {% else %}
+    --cart-drawer-progress-active-color: {{ block.settings.cart_drawer_progress_active_color }};
+    --cart-drawer-progress-inactive-color: {{ block.settings.cart_drawer_progress_inactive_color | default: '#ECECEC' }};
+    --cart-drawer-progress-active-icon-fill-color: {{ block.settings.cart_drawer_progress_active_icon_fill_color | default: '#FFFFFF' }};
+  {% endif %}
+  }
+
+  .cart-drawer .free-product-progress-bar progress::-webkit-progress-value {
+      background-color: var(--cart-drawer-progress-active-color);
+  }
+
+  .cart-drawer .free-product-progress-bar progress {
+      color: var(--cart-drawer-progress-active-color);
+      background-color: var(--cart-drawer-progress-inactive-color);
+  }
+  .cart-drawer .free-product-progress-bar progress::-webkit-progress-bar {
+      background-color: var(--cart-drawer-progress-inactive-color);
+    }
+
+  .free-shipping-main.free-shipping-main-color svg path,
+    .free-shipping-main.free-shipping-main-color svg circle {
+      fill: var(--cart-drawer-progress-active-icon-fill-color);
+    }
+</style>
